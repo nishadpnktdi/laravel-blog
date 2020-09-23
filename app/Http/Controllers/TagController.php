@@ -2,25 +2,105 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Models\Post;
-use App\Models\Category;
 use App\Models\Tag;
+use Illuminate\Http\Request;
 
 class TagController extends Controller
 {
-    public function index($id)
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function index()
     {
-        $tag = Tag::query()->where('id', $id)->first();
+        $tags = Tag::get();
+        return view('tag/create')->with('tags', $tags);
+    }
 
-        $posts = $tag->posts()->get();
+    /**
+     * Show the form for creating a new resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function create()
+    {
+        //
+    }
 
-        $categories = Category::all();
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function store(Request $request)
+    {
+        $request->validate([
+            'name'      => 'required|min:3|max:255|string'
+        ]);
 
-        $tags= Tag::all();
+        $tag = new Tag();
+        $tag->name = $request->name;
+        $tag->save();
 
-        $recent_posts = Post::where('is_published',true)->ordereBy('created_at','desc')->take(5)->get();
+        return redirect()->route('tag.index')->withSuccess('Tag created!');
+    }
 
-        return view('tag', compact($tag, $posts, $categories, $tags, $recent_posts));
+    /**
+     * Display the specified resource.
+     *
+     * @param  \App\Models\Tag  $tag
+     * @return \Illuminate\Http\Response
+     */
+    public function show(Tag $tag)
+    {
+        //
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     *
+     * @param  \App\Models\Tag  $tag
+     * @return \Illuminate\Http\Response
+     */
+    public function edit(Tag $tag)
+    {
+        //
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Models\Tag  $tag
+     * @return \Illuminate\Http\Response
+     */
+    public function update(Request $request, Tag $tag)
+    {
+        $validatedData = $this->validate($request, [
+            'name'  => 'required|min:3|max:255|string'
+        ]);
+
+        $tag = new Tag();
+
+        $tag->where('id', $id)->update($validatedData);
+
+        return redirect()->route('tag.index')->withSuccess('Tag updated!');
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  \App\Models\Tag  $tag
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy(Tag $tag)
+    {
+        $tag = new Tag();
+
+        $tag->where('id', $id)->delete();
+
+        return redirect()->route('tag.index')->withSuccess('Tag deleted!');
     }
 }
