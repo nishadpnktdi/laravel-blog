@@ -9,8 +9,8 @@ class AdminController extends Controller
 {
     public function __invoke() {
 
-        $post = Post::get();
+        $posts = Post::get();
 
-        return view('admin/dashboard')->with(compact("post"));
+        return view('admin/dashboard')->with(compact("posts"));
     }
 }

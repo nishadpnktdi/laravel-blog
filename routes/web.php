@@ -18,14 +18,14 @@ use App\Http\Controllers\AdminController;
 |
 */
 
-Route::get('/', [PostController::class,'index']);
+Route::get('/', [PostController::class, 'index']);
 
 Route::resources([
     'category' => CategoryController::class,
-    'tag'=>TagController::class,
+    'tag' => TagController::class,
     'post' => PostController::class,
 ]);
 
 Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', AdminController::class)->name('dashboard');
 
-Route::view('/blog', 'blog');
+Route::get('/blog', [PostController::class, 'index']);

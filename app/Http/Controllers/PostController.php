@@ -16,9 +16,8 @@ class PostController extends Controller
      */
     public function index()
     {
-        $post = Post::get();
-
-        return view('index')->with(compact("post"));
+        $posts = Post::get();
+        return view('blog')->with(compact("posts"));
     }
 
     /**
@@ -80,7 +79,7 @@ class PostController extends Controller
         if (empty($post)) {
             abort(404);
         } else {
-            return view('post', ['post' => $post]);
+            return view('post')->with(compact('post'));
         }
     }
 
