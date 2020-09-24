@@ -37,7 +37,7 @@ class CategoryController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name'      => 'required|min:3|max:255|string'
+            'name'      => 'required|min:3|max:255|string|unique:categories'
         ]);
 
         $category = new Category();
@@ -78,14 +78,15 @@ class CategoryController extends Controller
      */
     public function update(Request $request, $id)
     {
-        // $validatedData = $this->validate($request, [
-        //     'name'  => 'required|min:3|max:255|string'
-        // ]);
+        $validatedData = $this->validate($request, [
+            'name'  => 'required|min:3|max:255|string|unique:categories'
+        ]);
             $category = Category::find($id);
             $category->name = $request->name;
+            $category->name = $validatedData['name'];
             $category->save();
 
-        return response('message', 200);
+        return response(200);
     }
 
     /**

@@ -2,70 +2,75 @@
 
 @section('content')
 <div class="row">
-            <div class="col-md-12">
-              <div class="row">
-                <div class="col-md-12 grid-margin">
-                  <div class="card">
-                    <div class="card-body">
-                      <div class="d-flex justify-content-between">
-                        <h4 class="card-title mb-0">Posts</h4>
-                        <a href="/post/create"><button type="button" class="btn btn-primary btn-fw btn-rounded">New Post</button></a>
-                      </div>
-                      <div class="table-responsive">
-                        <table class="table table-striped table-hover">
-                          <thead>
-                            <tr>
-                              <th>Featured Image</th>
-                              <th>Title</th>
-                              <th>Status</th>
-                              <th>Publishing date</th>
-                              <th>Actions</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            <tr>
-                              <td>INV-87239</td>
-                              <td>Viola Ford</td>
-                              <td>Paid</td>
-                              <td>20 Jan 2019</td>
-                              <td>$755</td>
-                            </tr>
-                            <tr>
-                              <td>INV-87239</td>
-                              <td>Dylan Waters</td>
-                              <td>Unpaid</td>
-                              <td>23 Feb 2019</td>
-                              <td>$800</td>
-                            </tr>
-                            <tr>
-                              <td>INV-87239</td>
-                              <td>Louis Poole</td>
-                              <td>Unpaid</td>
-                              <td>25 Mar 2019</td>
-                              <td>$463</td>
-                            </tr>
-                            <tr>
-                              <td>INV-87239</td>
-                              <td>Vera Howell</td>
-                              <td>Paid</td>
-                              <td>27 Mar 2019</td>
-                              <td>$235</td>
-                            </tr>
-                            <tr>
-                              <td>INV-87239</td>
-                              <td>Allie Goodman</td>
-                              <td>Unpaid</td>
-                              <td>1 Apr 2019</td>
-                              <td>$657</td>
-                            </tr>
-                          </tbody>
-                        </table>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+  <div class="col-md-12">
+    <div class="row">
+      <div class="col-md-12 grid-margin">
+        <div class="card">
+          <div class="card-body">
+            <div class="d-flex justify-content-between">
+              <h4 class="card-title mb-0">Posts</h4>
+              <a href="/post/create"><button type="button" class="btn btn-primary btn-fw btn-rounded">New Post</button></a>
+            </div>
+            <div class="table-responsive">
+              <table class="table table-striped table-hover">
+                <thead>
+                  <tr>
+                    <th>Featured Image</th>
+                    <th>Title</th>
+                    <th>Status</th>
+                    <th>Publishing date</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @foreach($post as $post)
+                  <tr>
+                    <td><img class="rounded-0" src="images/{{$post->featured_image}}"/></td>
+                    <td>{{$post->title}}</td>
+                    <td>{{$post->is_published}}</td>
+                    <td>{{$post->created_at}}</td>
+                    <td>
+                      <a href="/post/{{ $post->id }}/edit" class="card-link">
+                        <button type="button" class="btn btn-dark">
+                          <i class="mdi mdi-pencil"></i>Edit</button>
+                      </a>
+
+                      <a class="card-link delete-blog" data-id="{{ $post->id }}" href="">
+                        <button type="button" class="btn btn-danger">
+                          <i class="mdi mdi-delete"></i>Delete</button>
+                        </a>
+                    </td>
+                  </tr>
+                  @endforeach
+                </tbody>
+              </table>
             </div>
           </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 
 @endsection
+
+@push('scripts')
+<script>
+    $('.delete-blog').on('click', function() {
+        let _that = $(this);
+        $.ajax({
+            url: '/blogs/' + _that.data('id'),
+            type: 'DELETE',
+            data: {
+                "_token": "{{ csrf_token() }}",
+            },
+            success: function(result) {
+                // Do something with the result
+                $('#delete-message').removeClass('d-none');
+                $('#delete-message').html(result.message);
+                _that.closest('.col-md-4').remove();
+            }
+        });
+    });
+</script>
+@endpush

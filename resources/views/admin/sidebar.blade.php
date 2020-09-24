@@ -1,17 +1,17 @@
 <nav class="sidebar sidebar-offcanvas" id="sidebar">
         <ul class="nav">
-          <!-- <li class="nav-item nav-profile">
-            <a href="#" class="nav-link">
-              <div class="profile-image">
+          <li class="nav-item nav-profile">
+            <a href="post/create" class="nav-link">
+              <!-- <div class="profile-image">
                 <img class="img-xs rounded-circle" src="{{ Auth::user()->profile_photo_url }}" alt="profile image">
                 <div class="dot-indicator bg-success"></div>
-              </div>
+              </div> -->
               <div class="text-wrapper">
-                <p class="profile-name">{{ Auth::user()->name }}</p>
-                <p class="designation">Premium user</p>
+                <!-- <p class="profile-name">{{ Auth::user()->name }}</p> -->
+                <p class="designation">New Post</p>
               </div>
             </a>
-          </li> -->
+          </li>
           <li class="nav-item nav-category">Main Menu</li>
           <li class="nav-item">
             <a class="nav-link" href="/dashboard">

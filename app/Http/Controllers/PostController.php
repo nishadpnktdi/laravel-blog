@@ -42,20 +42,27 @@ class PostController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'title' => 'required|unique:blogs',
+            'title' => 'required|unique:posts',
             'author' => 'required',
             'content' => 'required',
-            'category' => 'required'
+            'category' => 'required',
+            'image'=>'mimes:jpeg,png,jpg,gif|max:2048'
         ]);
 
-        $blog = new Post();
-        $blog->title = $request->title;
-        $blog->author_id = $request->author;
-        $blog->content = $request->content;
-        $blog->category_id = $request->category;
-        $blog->save();
+        $post = new Post();
 
-        $blog->tags()->sync($request->tags);
+        $imageName = time().'_'.$request->image->extension();
+        $imagePath = $request->image->move(public_path('images'), $imageName);
+        
+        $post->featured_image= $imagePath;
+
+        $post->title = $request->title;
+        $post->user_id = $request->author;
+        $post->content = $request->content;
+        $post->category_id = $request->category;
+        $post->save();
+
+        $post->tags()->sync($request->tags);
 
         return redirect()->back()->with('message', 'Post published');
     }
@@ -66,7 +73,7 @@ class PostController extends Controller
      * @param  \App\Models\Post  $post
      * @return \Illuminate\Http\Response
      */
-    public function show(Post $post, $id)
+    public function show($id)
     {
         $post = new Post();
         $post = $post->find($id);
@@ -83,7 +90,7 @@ class PostController extends Controller
      * @param  \App\Models\Post  $post
      * @return \Illuminate\Http\Response
      */
-    public function edit(Post $post, $id)
+    public function edit($id)
     {
         $post = new Post();
         $post = $post->where('id', $id)->first();
@@ -93,7 +100,7 @@ class PostController extends Controller
             $categories = Category::get();
             $tags = Tag::get();
             $selectedTags = Post::find($id)->tags;
-            return view('editPost', ['post' => $post, 'categories' => $categories, 'tags' => $tags, 'selectedTags' => $selectedTags]);
+            return view('post/edit', ['post' => $post, 'categories' => $categories, 'tags' => $tags, 'selectedTags' => $selectedTags]);
         }
     }
 
@@ -104,16 +111,22 @@ class PostController extends Controller
      * @param  \App\Models\Post  $post
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Post $post, $id)
+    public function update(Request $request, $id)
     {
-        $request->validate([
-            'title' => 'required',
-            'author' => 'required',
-            'content' => 'required',
-            'category' => 'required'
-        ]);
+        // $request->validate([
+        //     'title' => 'required',
+        //     'author' => 'required',
+        //     'content' => 'required',
+        //     'category' => 'required',
+        //     'image'=>'mimes:jpeg,png,jpg,gif|max:2048'
+        // ]);
 
         $post = new Post();
+        // return $request->file('image')->getClientOriginalName();
+        $imageName = time().'_'.$request->file('image')->getClientOriginalName();
+        $request->image->move(public_path('images'), $imageName);
+        
+        // $post->featured_image= $imageName;
 
         $title = $request->title;
         $author = $request->author;
@@ -122,9 +135,10 @@ class PostController extends Controller
 
         $post->where('id', $id)->update([
             'title' => $title,
-            'author_id' => $author,
+            'user_id' => $author,
             'content' => $content,
-            'category_id' => $category
+            'category_id' => $category,
+            'featured_image' => $imageName
         ]);
 
         if (isset($request->tags)) {
@@ -142,7 +156,7 @@ class PostController extends Controller
      * @param  \App\Models\Post  $post
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Post $post, $id)
+    public function destroy($id)
     {
         $post = Post::find($id);
 

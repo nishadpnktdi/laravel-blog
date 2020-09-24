@@ -2,34 +2,43 @@
 
 @section('content')
 <div class="row">
-  <div class="col-md-8 d-flex align-items-stretch grid-margin">
-    <div class="row flex-grow">
-      <div class="col-12 stretch-card">
+  <div class="col-md-8">
+    <div class="row">
+      <div class="col-md-12 grid-margin">
         <div class="card">
           <div class="card-body">
-            <h4 class="card-title">New Post</h4>
-            <form action="#" method="POST">
-              @csrf
-              <div class="form-group">
-                <div class="form-group">
-                  <label for="exampleFormControlInput1">Title</label>
-                  <input type="text" class="form-control" name="title" value="{{ old('title') }}">
-                  @error('title')
-                  <div class="text-danger">{{ $message }}</div>
-                  @enderror
-                </div>
-              </div>
-              <input type="hidden" class="form-control" name="author" placeholder="" value="{{ Auth::user()->id }}">
-              <div class="form-group">
-                <label for="exampleFormControlTextarea1">Content</label>
-                <textarea class="form-control" name="content" rows="13" value="{{ old('content') }}"></textarea>
-                @error('content')
-                <div class="text-danger">{{ $message }}</div>
-                @enderror
-              </div>
-              <button type="submit" class="btn btn-success mr-2">Publish</button>
-              <button type="reset" class="btn btn-light">Clear</button>
-            </form>
+            <div class="d-flex justify-content-between">
+              <h4 class="card-title mb-0">Tags</h4>
+            </div>
+            <div class="table-responsive">
+              <table class="table table-striped table-hover">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @foreach ($tags as $tag)
+                  <tr>
+                    <td>{{$tag->name}}</td>
+                    <td>
+                      <div class="button-group d-flex">
+                        <button type="button" class="btn btn-sm btn-primary mr-1 edit-tag" data-toggle="modal" id="editTagModal" data-id="{{ $tag->id }}" data-name="{{ $tag->name }}">Edit</button>
+
+                        <form action="{{ route('tag.destroy', $tag->id) }}" method="POST">
+                          @csrf
+                          @method('DELETE')
+
+                          <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                        </form>
+                      </div>
+                    </td>
+                  </tr>
+                  @endforeach
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>
@@ -41,39 +50,21 @@
       <div class="col-12 stretch-card">
         <div class="card">
           <div class="card-body">
-            <h5 class="card-title">Featured Image</h5>
-            <div class="form-group">
-              <label>File upload</label>
-              <input type="file" name="img[]" class="file-upload-default">
-              <div class="input-group col-xs-12">
-                <input type="text" class="form-control file-upload-info" disabled placeholder="Upload Image">
-                <span class="input-group-append">
-                  <button class="file-upload-browse btn btn-info" type="button">Upload</button>
-                </span>
+            <h5 class="card-title">Create Tag</h5>
+            <form action="{{ route('tag.store') }}" method="POST">
+              @csrf
+
+              <div class="form-group">
+                <input type="text" name="name" class="form-control" value="{{ old('name') }}" placeholder="Tag Name" required>
               </div>
-            </div>
-            <h5 class="card-title">Category</h5>
-            <div class="form-group">
-              <select name="category" class="form-control mb-3 select-category">
-                @foreach ($categories as $category )
-                <option value="{{ $category->id }}">{{ $category->name }}</option>
-                @endforeach
-              </select>
-              @error('category')
+              @error('name')
               <div class="text-danger">{{ $message }}</div>
               @enderror
-            </div>
-            <h5 class="card-title">Tags</h5>
-            <div class="form-group select2 js-example-basic-multiple">
-              <select name="tags[]" class="form-control select-tags-basic-multiple" multiple="multiple">
-                @foreach ($tags as $tag )
-                <option value="{{ $tag->id }}">{{ $tag->name }}</option>
-                @endforeach
-              </select>
-              @error('tags')
-              <div class="text-danger">{{ $message }}</div>
-              @enderror
-            </div>
+
+              <div class="form-group">
+                <button type="submit" class="btn btn-primary">Create</button>
+              </div>
+            </form>
           </div>
         </div>
       </div>
@@ -82,3 +73,59 @@
 
 </div>
 @endsection
+@push('scripts')
+<script type="text/javascript">
+  $(".edit-tag").click(function() {
+    swal({
+        title: 'Type new Tag name',
+        content: {
+          element: 'input',
+          attributes: {
+            placeholder: $(this).data('name')
+          }
+        },
+        button: {
+          text: "Update",
+          closeModal: false,
+        },
+      })
+      .then(name => {
+        if (!name)
+          return swal.close();
+
+        var id = $(this).data('id');
+        $.ajaxSetup({
+          headers: {
+            'X-CSRF-TOKEN': jQuery('meta[name="csrf-token"]').attr('content')
+          }
+        });
+        $.ajax({
+          type: "PATCH",
+          url: "tag/" + id,
+          data: {
+            "_token": "{{ csrf_token() }}",
+            "name": name
+          },
+          success: function(response) {
+            console.log(response);
+            swal({
+              title: "Successfully updated",
+              icon: "success",
+              timer: 5000
+            }).then(function() {
+              location.reload();
+            });
+          },
+          error: function(data) {
+            swal({
+              title: "Failed to update",
+              text: data.responseJSON['errors']['name'][0],
+              icon: "error",
+            })
+          }
+        });
+
+      });
+  });
+</script>
+@endpush

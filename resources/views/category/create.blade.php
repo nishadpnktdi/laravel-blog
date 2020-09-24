@@ -57,6 +57,9 @@
               <div class="form-group">
                 <input type="text" name="name" class="form-control" value="{{ old('name') }}" placeholder="Category Name" required>
               </div>
+              @error('name')
+              <div class="text-danger">{{ $message }}</div>
+              @enderror
 
               <div class="form-group">
                 <button type="submit" class="btn btn-primary">Create</button>
@@ -74,8 +77,13 @@
 <script type="text/javascript">
   $(".edit-category").click(function() {
     swal({
-        text: 'Type new category name',
-        content: "input",
+        title: 'Type new category name',
+        content: {
+          element: 'input',
+          attributes: {
+            placeholder: $(this).data('name')
+          }
+        },
         button: {
           text: "Update",
           closeModal: false,
@@ -83,8 +91,8 @@
       })
       .then(name => {
         if (!name)
-        return swal.close();
-      
+          return swal.close();
+
         var id = $(this).data('id');
         $.ajaxSetup({
           headers: {
@@ -102,16 +110,16 @@
             console.log(response);
             swal({
               title: "Successfully updated",
-              text: name,
               icon: "success",
+              timer: 5000
             }).then(function() {
               location.reload();
             });
           },
-          error: function() {
+          error: function(data) {
             swal({
               title: "Failed to update",
-              text: name,
+              text: data.responseJSON['errors']['name'][0],
               icon: "error",
             })
           }

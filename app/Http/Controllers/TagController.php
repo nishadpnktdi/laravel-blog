@@ -37,7 +37,7 @@ class TagController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name'      => 'required|min:3|max:255|string'
+            'name'      => 'required|min:3|max:255|string|unique:tags'
         ]);
 
         $tag = new Tag();
@@ -76,17 +76,17 @@ class TagController extends Controller
      * @param  \App\Models\Tag  $tag
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Tag $tag)
+    public function update(Request $request, $id)
     {
         $validatedData = $this->validate($request, [
-            'name'  => 'required|min:3|max:255|string'
+            'name'  => 'required|min:3|max:255|string|unique:tags'
         ]);
+        $tag = Tag::find($id);
+        $tag->name = $request->name;
+        $tag->name = $validatedData['name'];
+        $tag->save();
 
-        $tag = new Tag();
-
-        $tag->where('id', $id)->update($validatedData);
-
-        return redirect()->route('tag.index')->withSuccess('Tag updated!');
+        return response(200);
     }
 
     /**
@@ -95,7 +95,7 @@ class TagController extends Controller
      * @param  \App\Models\Tag  $tag
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Tag $tag)
+    public function destroy($id)
     {
         $tag = new Tag();
 
