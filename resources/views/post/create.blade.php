@@ -9,6 +9,11 @@
         <div class="col-12 stretch-card">
           <div class="card">
             <div class="card-body">
+            @if (session('message'))
+              <div class="alert alert-success mt-3">
+                {{ session('message') }}
+              </div>
+              @endif
               <h4 class="card-title">New Post</h4>
 
               <div class="form-group">
@@ -23,7 +28,7 @@
               <input type="hidden" class="form-control" name="author" placeholder="" value="{{ Auth::user()->id }}">
               <div class="form-group">
                 <label for="exampleFormControlTextarea1">Content</label>
-                <textarea class="form-control" name="content" rows="13" value="{{ old('content') }}"></textarea>
+                <textarea class="form-control" name="content" rows="13" >{{ old('content') }}</textarea>
                 @error('content')
                 <div class="text-danger">{{ $message }}</div>
                 @enderror
@@ -44,9 +49,11 @@
             <div class="card-body">
               <h5 class="card-title">Featured Image</h5>
               <div class="form-group">
-                <label>File upload</label>
                 <div class="input-group col-xs-12">
-                  <input type="file" name="image" class="dropify" />
+                  <input type="file" name="image" value="{{ old('image') }}" class="dropify" />
+                  @error('image')
+                <div class="text-danger">{{ $message }}</div>
+                @enderror
                 </div>
               </div>
               <h5 class="card-title">Category</h5>

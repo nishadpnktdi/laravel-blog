@@ -16,9 +16,6 @@
               </div>
               @endif
               <h4 class="card-title">Edit Post</h4>
-              <!-- <form action="/post/{{$post->id}}" method="POST" enctype="multipart/form-data">
-              @method('PATCH')
-              @csrf -->
               <div class="form-group">
                 <div class="form-group">
                   <label for="exampleFormControlInput1">Title</label>
@@ -51,9 +48,8 @@
             <div class="card-body">
               <h5 class="card-title">Featured Image</h5>
               <div class="form-group">
-                <label>File upload</label>
                 <div class="input-group col-xs-12">
-                  <input type="file" name="image" class="dropify" />
+                  <input type="file" name="image" class="dropify" data-default-file="/images/{{ $post->featured_image }}" />
                 </div>
 
 
@@ -94,9 +90,9 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Dropify/0.2.2/js/dropify.js" integrity="sha512-hJsxoiLoVRkwHNvA5alz/GVA+eWtVxdQ48iy4sFRQLpDrBPn6BFZeUcW4R4kU+Rj2ljM9wHwekwVtsb0RY/46Q==" crossorigin="anonymous"></script>
 <script>
   $(document).ready(function() {
-  $('.select-category').select2();
-  $('.select-tags-basic-multiple').select2();
-  $('.dropify').dropify();
+    $('.select-category').select2();
+    $('.select-tags-basic-multiple').select2();
+    $('.dropify').dropify();
   });
 </script>
 @endpush

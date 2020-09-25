@@ -50,7 +50,7 @@
           @endif
           @guest
           <ul class="langs navbar-text">
-            <a href="login" class="active">Login</a>
+            <a href="/login" class="active">Login</a>
             <span> </span>
             <a href="register">Sign Up</a>
           </ul>

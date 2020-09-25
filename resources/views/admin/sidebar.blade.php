@@ -1,7 +1,7 @@
 <nav class="sidebar sidebar-offcanvas" id="sidebar">
         <ul class="nav">
           <li class="nav-item nav-profile">
-            <a href="post/create" class="nav-link">
+            <a href="/post/create" class="nav-link">
               <!-- <div class="profile-image">
                 <img class="img-xs rounded-circle" src="{{ Auth::user()->profile_photo_url }}" alt="profile image">
                 <div class="dot-indicator bg-success"></div>

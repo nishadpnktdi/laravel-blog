@@ -16,8 +16,11 @@ class PostController extends Controller
      */
     public function index()
     {
-        $posts = Post::get();
-        return view('blog')->with(compact("posts"));
+        $tags=Tag::get();
+        $categories=Category::withCount('posts')->get();
+        $posts = Post::latest()->paginate(6);
+        $latest = Post::limit(5)->get();
+        return view('blog')->with(compact("posts","categories","tags","latest"));
     }
 
     /**
@@ -45,15 +48,15 @@ class PostController extends Controller
             'author' => 'required',
             'content' => 'required',
             'category' => 'required',
-            'image'=>'mimes:jpeg,png,jpg,gif|max:2048'
+            'image'=>'required|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
 
         $post = new Post();
 
-        $imageName = time().'_'.$request->image->extension();
-        $imagePath = $request->image->move(public_path('images'), $imageName);
+        $imageName = time().'_'.$request->file('image')->getClientOriginalName();
+        $request->image->move(public_path('images'), $imageName);
         
-        $post->featured_image= $imagePath;
+        $post->featured_image= $imageName;
 
         $post->title = $request->title;
         $post->user_id = $request->author;
@@ -76,10 +79,14 @@ class PostController extends Controller
     {
         $post = new Post();
         $post = $post->find($id);
+        // $posts = Post::latest()->paginate(2);
+        $latest = Post::limit(5)->get();
+        $tags=Tag::get();
+        $categories=Category::withCount('posts')->get();
         if (empty($post)) {
             abort(404);
         } else {
-            return view('post')->with(compact('post'));
+            return view('post')->with(compact('post','tags','categories','latest'));
         }
     }
 
@@ -112,26 +119,25 @@ class PostController extends Controller
      */
     public function update(Request $request, $id)
     {
-        // $request->validate([
-        //     'title' => 'required',
-        //     'author' => 'required',
-        //     'content' => 'required',
-        //     'category' => 'required',
-        //     'image'=>'mimes:jpeg,png,jpg,gif|max:2048'
-        // ]);
+        $request->validate([
+            'title' => 'required',
+            'author' => 'required',
+            'content' => 'required',
+            'category' => 'required',
+            'image'=>'required|mimes:jpeg,png,jpg,gif|max:2048'
+        ]);
 
         $post = new Post();
-        // return $request->file('image')->getClientOriginalName();
-        $imageName = time().'_'.$request->file('image')->getClientOriginalName();
-        $request->image->move(public_path('images'), $imageName);
-        
-        // $post->featured_image= $imageName;
 
         $title = $request->title;
         $author = $request->author;
         $content = $request->content;
         $category = $request->category;
 
+        if($request->hasFile('image')){
+        $imageName = time().'_'.$request->file('image')->getClientOriginalName();
+        $request->image->move(public_path('images'), $imageName);
+        
         $post->where('id', $id)->update([
             'title' => $title,
             'user_id' => $author,
@@ -139,6 +145,14 @@ class PostController extends Controller
             'category_id' => $category,
             'featured_image' => $imageName
         ]);
+        }
+
+            $post->where('id', $id)->update([
+                'title' => $title,
+                'user_id' => $author,
+                'content' => $content,
+                'category_id' => $category,
+            ]);
 
         if (isset($request->tags)) {
             Post::find($id)->tags()->sync($request->tags);
@@ -159,10 +173,11 @@ class PostController extends Controller
     {
         $post = Post::find($id);
 
-        $post->delete();
+        $post->delete();    
 
         return [
-            'message' => 'Successfully Deleted'
+            'message' => 'Post Deleted',
+            'post_count' => Post::count()
         ];
     }
 }
