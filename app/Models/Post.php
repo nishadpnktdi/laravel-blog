@@ -4,10 +4,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Laravel\Scout\Searchable;
 
 class Post extends Model
 {
     use HasFactory;
+    use Searchable;
+
+    public $asYouType = true;
 
     public function user()
     {
@@ -22,5 +26,14 @@ class Post extends Model
     public function tags()
     {
         return $this->belongsToMany('App\Models\Tag');
+    }
+
+    public function toSearchableArray()
+    {
+        $array = $this->toArray();
+
+        // Customize array...
+
+        return $array;
     }
 }

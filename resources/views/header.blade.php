@@ -32,7 +32,9 @@
             <li class="nav-item"><a href="#" class="nav-link ">Contact</a>
             </li>
           </ul>
-          <div class="navbar-text"><a href="#" class="search-btn"><i class="icon-search-1"></i></a></div>
+          <div class="navbar-text">
+            <a href="/search" name="search" class="search-btn"><i class="icon-search-1"></i></a>
+          </div>
           @if(@auth)
           @auth
           <ul class="langs navbar-text">

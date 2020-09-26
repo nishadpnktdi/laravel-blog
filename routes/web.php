@@ -20,6 +20,8 @@ use App\Http\Controllers\AdminController;
 
 Route::get('/', [PostController::class, 'index']);
 
+Route::get('/search', [PostController::class, 'search']);
+
 Route::resources([
     'category' => CategoryController::class,
     'tag' => TagController::class,

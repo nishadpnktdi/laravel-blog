@@ -12,7 +12,7 @@ class PostController extends Controller
 
     public function __construct()
     {
-        $this->middleware('auth', ['except' => ['index', 'show']]);
+        $this->middleware('auth', ['except' => ['index', 'show', 'search']]);
     }
 
     /**
@@ -24,7 +24,7 @@ class PostController extends Controller
     {
         $tags = Tag::get();
         $categories = Category::withCount('posts')->get();
-        $posts = Post::with('user','category')->latest()->paginate(6);
+        $posts = Post::with('user', 'category')->latest()->paginate(6);
         $latest = Post::limit(5)->get();
         return view('blog')->with(compact("posts", "categories", "tags", "latest"));
     }
@@ -97,7 +97,7 @@ class PostController extends Controller
         if (empty($post)) {
             abort(404);
         } else {
-            return view('post')->with(compact('post', 'tags', 'categories', 'latest','next','prev'));
+            return view('post')->with(compact('post', 'tags', 'categories', 'latest', 'next', 'prev'));
         }
     }
 
@@ -190,5 +190,22 @@ class PostController extends Controller
             'message' => 'Post Deleted',
             'post_count' => Post::count()
         ];
+    }
+
+    public function search(Request $request)
+    {
+        $request->validate([
+            'search' => 'required'
+        ]);
+
+        $keyword = $request->search;
+
+        $latest = Post::limit(5)->get();
+        $tags = Tag::get();
+        $categories = Category::withCount('posts')->get();
+
+        $results = Post::search($keyword)->paginate(6);
+
+        return view('search', compact('results','keyword', 'latest', 'tags', 'categories'));
     }
 }
