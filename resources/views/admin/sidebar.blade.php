@@ -20,13 +20,13 @@
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="/category">
+            <a class="nav-link" href="/category/create">
               <i class="menu-icon typcn typcn-shopping-bag"></i>
               <span class="menu-title">Categories</span>
             </a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="/tag">
+            <a class="nav-link" href="/tag/create">
               <i class="menu-icon typcn typcn-th-large-outline"></i>
               <span class="menu-title">Tags</span>
             </a>

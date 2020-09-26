@@ -3,10 +3,21 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
+use App\Models\Post;
+use App\Models\Tag;
+
+
 use Illuminate\Http\Request;
 
 class CategoryController extends Controller
 {
+
+    public function __construct()
+    {
+        $this->middleware('auth', ['except' => ['show']]);
+    }
+
+
     /**
      * Display a listing of the resource.
      *
@@ -14,8 +25,7 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        $categories = Category::get();
-        return view('category/create')->with('categories', $categories);
+        
     }
 
     /**
@@ -25,7 +35,8 @@ class CategoryController extends Controller
      */
     public function create()
     {
-        //
+        $categories = Category::get();
+        return view('category/create')->with('categories', $categories);
     }
 
     /**
@@ -53,9 +64,16 @@ class CategoryController extends Controller
      * @param  \App\Models\Category  $category
      * @return \Illuminate\Http\Response
      */
-    public function show(Category $category)
+    public function show($id)
     {
-        //
+        $tags = Tag::get();
+        $categories = Category::withCount('posts')->get();
+        $posts = Post::whereHas('category', function($query) use ($id){
+            return $query->where('id', $id);
+        })->latest()->paginate(6);
+        $latest = Post::limit(5)->get();
+        $category=Category::find($id);
+        return view('category/category')->with(compact("category","posts", "categories", "tags", "latest"));
     }
 
     /**

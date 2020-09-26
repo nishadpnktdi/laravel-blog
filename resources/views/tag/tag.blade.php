@@ -14,15 +14,18 @@
       <!-- Latest Posts -->
       <main class="posts-listing col-lg-8">
         <div class="container">
+        <h3 class="h4 mb-4">{{$tag['name']}}</h3>
+        <hr>
           <div class="row">
             <!-- post -->
             @foreach($posts as $post)
+            
             <div class="post col-xl-6">
-              <div class="post-thumbnail"><a href="/post/{{$post->id}}"><img src="/images/{{ $post->featured_image }}" alt="..." class="img-fluid"></a></div>
+              <div class="post-thumbnail"><a href="post/{{$post->id}}"><img src="/images/{{ $post->featured_image }}" alt="..." class="img-fluid"></a></div>
               <div class="post-details">
                 <div class="post-meta d-flex justify-content-between">
                   <div class="date meta-last">{{$post->created_at->format('d M | Y')}}</div>
-                  <div class="category"><a href="/category/{{$post['category']->id}}">{{$post->category['name']}}</a></div>
+                  <div class="category"><a href="#">{{$post->category['name']}}</a></div>
                 </div><a href="/post/{{$post->id}}">
                   <h3 class="h4">{{$post->title}}</h3>
                 </a>

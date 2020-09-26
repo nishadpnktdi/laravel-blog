@@ -9,6 +9,12 @@ use Illuminate\Http\Request;
 
 class PostController extends Controller
 {
+
+    public function __construct()
+    {
+        $this->middleware('auth', ['except' => ['index', 'show']]);
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -16,11 +22,11 @@ class PostController extends Controller
      */
     public function index()
     {
-        $tags=Tag::get();
-        $categories=Category::withCount('posts')->get();
-        $posts = Post::latest()->paginate(6);
+        $tags = Tag::get();
+        $categories = Category::withCount('posts')->get();
+        $posts = Post::with('user','category')->latest()->paginate(6);
         $latest = Post::limit(5)->get();
-        return view('blog')->with(compact("posts","categories","tags","latest"));
+        return view('blog')->with(compact("posts", "categories", "tags", "latest"));
     }
 
     /**
@@ -48,15 +54,15 @@ class PostController extends Controller
             'author' => 'required',
             'content' => 'required',
             'category' => 'required',
-            'image'=>'required|mimes:jpeg,png,jpg,gif|max:2048'
+            'image' => 'required|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
 
         $post = new Post();
 
-        $imageName = time().'_'.$request->file('image')->getClientOriginalName();
+        $imageName = time() . '_' . $request->file('image')->getClientOriginalName();
         $request->image->move(public_path('images'), $imageName);
-        
-        $post->featured_image= $imageName;
+
+        $post->featured_image = $imageName;
 
         $post->title = $request->title;
         $post->user_id = $request->author;
@@ -78,15 +84,20 @@ class PostController extends Controller
     public function show($id)
     {
         $post = new Post();
-        $post = $post->find($id);
-        // $posts = Post::latest()->paginate(2);
+        $post = $post->with('user')->find($id);
         $latest = Post::limit(5)->get();
-        $tags=Tag::get();
-        $categories=Category::withCount('posts')->get();
+        $tags = Tag::get();
+        $categories = Category::withCount('posts')->get();
+
+        //Next and Previous Post
+        $next = Post::where('id', '>', $post->id)->oldest('id')->first();
+        $prev = Post::where('id', '<', $post->id)->latest('id')->first();
+        //End Next and Previous Post
+
         if (empty($post)) {
             abort(404);
         } else {
-            return view('post')->with(compact('post','tags','categories','latest'));
+            return view('post')->with(compact('post', 'tags', 'categories', 'latest','next','prev'));
         }
     }
 
@@ -124,7 +135,7 @@ class PostController extends Controller
             'author' => 'required',
             'content' => 'required',
             'category' => 'required',
-            'image'=>'required|mimes:jpeg,png,jpg,gif|max:2048'
+            'image' => 'required|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
 
         $post = new Post();
@@ -134,25 +145,25 @@ class PostController extends Controller
         $content = $request->content;
         $category = $request->category;
 
-        if($request->hasFile('image')){
-        $imageName = time().'_'.$request->file('image')->getClientOriginalName();
-        $request->image->move(public_path('images'), $imageName);
-        
-        $post->where('id', $id)->update([
-            'title' => $title,
-            'user_id' => $author,
-            'content' => $content,
-            'category_id' => $category,
-            'featured_image' => $imageName
-        ]);
-        }
+        if ($request->hasFile('image')) {
+            $imageName = time() . '_' . $request->file('image')->getClientOriginalName();
+            $request->image->move(public_path('images'), $imageName);
 
             $post->where('id', $id)->update([
                 'title' => $title,
                 'user_id' => $author,
                 'content' => $content,
                 'category_id' => $category,
+                'featured_image' => $imageName
             ]);
+        }
+
+        $post->where('id', $id)->update([
+            'title' => $title,
+            'user_id' => $author,
+            'content' => $content,
+            'category_id' => $category,
+        ]);
 
         if (isset($request->tags)) {
             Post::find($id)->tags()->sync($request->tags);
@@ -173,7 +184,7 @@ class PostController extends Controller
     {
         $post = Post::find($id);
 
-        $post->delete();    
+        $post->delete();
 
         return [
             'message' => 'Post Deleted',

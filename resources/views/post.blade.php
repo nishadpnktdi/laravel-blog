@@ -25,7 +25,7 @@
               </div>
               <h1>{{$post->title}}<a href="#"><i class="fa fa-bookmark-o"></i></a></h1>
               <div class="post-footer d-flex align-items-center flex-column flex-sm-row"><a href="#" class="author d-flex align-items-center flex-wrap">
-                  <div class="avatar"><img src="img/avatar-1.jpg" alt="..." class="img-fluid"></div>
+                  <div class="avatar"><img src="{{isset($post->user['profile_photo_path']) ? '/storage/'.$post->user['profile_photo_path'] : asset('frontend/img/user.svg')}}" alt="..." class="img-fluid"></div>
                   <div class="title"><span>{{$post->user['name']}}</span></div>
                 </a>
                 <div class="d-flex align-items-center flex-wrap">
@@ -53,17 +53,47 @@
                 <a href="#" class="tag">{{$tag->name}}</a>
                 @endforeach
               </div>
-              <div class="posts-nav d-flex justify-content-between align-items-stretch flex-column flex-md-row"><a href="#" class="prev-post text-left d-flex align-items-center">
-                  <div class="icon prev"><i class="fa fa-angle-left"></i></div>
-                  <div class="text"><strong class="text-primary">Previous Post </strong>
-                    <h6>I Bought a Wedding Dress.</h6>
+              <div class="posts-nav d-flex justify-content-between align-items-stretch flex-column flex-md-row">
+                @if(isset($prev))
+                <a href="/post/{{$prev->id}}" class="prev-post text-left d-flex align-items-center">
+                  <div class="icon prev">
+                    <i class="fa fa-angle-left"></i>
                   </div>
-                </a><a href="#" class="next-post text-right d-flex align-items-center justify-content-end">
-                  <div class="text"><strong class="text-primary">Next Post </strong>
-                    <h6>I Bought a Wedding Dress.</h6>
+                  <div class="text">
+                    <strong class="text-primary">Previous Post </strong>
+                    <h6>{{$prev->title}}</h6>
+                  </div>
+                </a>
+                @else
+                <a class="prev-post text-left d-flex align-items-center invisible">
+                  <div class="icon prev">
+                    <i class="fa fa-angle-left"></i>
+                  </div>
+                  <div class="text">
+                    <strong class="text-primary">Previous Post </strong>
+                    <h6></h6>
+                  </div>
+                </a>
+                @endif
+
+                @if(isset($next))
+                <a href="/post/{{$next->id}}" class="next-post text-right d-flex align-items-center justify-content-end">
+                  <div class="text">
+                    <strong class="text-primary">Next Post </strong>
+                    <h6>{{$next->title}}</h6>
                   </div>
                   <div class="icon next"><i class="fa fa-angle-right"> </i></div>
-                </a></div>
+                </a>
+                @else
+                <a class="next-post text-right d-flex align-items-center justify-content-end invisible">
+                  <div class="text">
+                    <strong class="text-primary">Next Post </strong>
+                    <h6></h6>
+                  </div>
+                  <div class="icon next"><i class="fa fa-angle-right"> </i></div>
+                </a>
+                @endif
+              </div>
               <div class="post-comments">
                 <header>
                   <h3 class="h6">Post Comments<span class="no-of-comments">(3)</span></h3>

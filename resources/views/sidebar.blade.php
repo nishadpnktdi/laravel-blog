@@ -17,7 +17,7 @@
     </header>
     <div class="blog-posts">
         @foreach ($latest as $post)
-        <a href="#">
+        <a href="/post/{{$post->id}}">
             <div class="item d-flex align-items-center">
                 <div class="image">
                     <img src="/images/{{$post->featured_image}}" alt="..." class="img-fluid">
@@ -40,7 +40,7 @@
         <h3 class="h6">Categories</h3>
     </header>
     @foreach ($categories as $category)
-    <div class="item d-flex justify-content-between"><a href="#">{{$category->name}}</a><span>{{$category->posts_count}}</span></div>
+    <div class="item d-flex justify-content-between"><a href="/category/{{$category->id}}">{{$category->name}}</a><span>{{$category->posts_count}}</span></div>
     @endforeach
 </div>
 <!-- Widget [Tags Cloud Widget]-->
@@ -50,7 +50,7 @@
     </header>
     <ul class="list-inline">
         @foreach($tags as $tag)
-        <li class="list-inline-item"><a href="#" class="tag">{{$tag->name}}</a></li>
+        <li class="list-inline-item"><a href="/tag/{{$tag->id}}" class="tag">{{$tag->name}}</a></li>
         @endforeach
     </ul>
 </div>

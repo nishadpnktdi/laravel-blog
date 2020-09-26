@@ -7,6 +7,7 @@ use App\Models\Post;
 
 class AdminController extends Controller
 {
+
     public function __invoke() {
 
         $posts = Post::get();
