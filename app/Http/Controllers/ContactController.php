@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\ThanksMail;
 use App\Models\Contact;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
@@ -51,15 +52,11 @@ class ContactController extends Controller
 
         $contact->save();
 
-        $to_name = $request->name;
+        $name = $request->name;
         $to_email = $request->email;
-        $data = array('name'=>$to_name, "body" => "This is mail content");
   
-        Mail::send('/contact/mail', $data, function($message) use ($to_name, $to_email) {
-            $message->to($to_email, $to_name);
-            $message->subject('Laravel Blog Contact Form');
-            $message->from('nishad.pnktdi@gmail.com','Laravel Blog');
-            });
+        Mail::to($to_email)->send(new ThanksMail($name));
+        // Mail::to('nishad.pnktdi@gmail.com')->send(new ThanksMail($name));
 
         
         return back()->with('message', 'Thank you for contacting us!');

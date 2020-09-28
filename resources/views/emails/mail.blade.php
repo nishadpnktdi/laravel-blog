@@ -1,2 +1,2 @@
-<h3>Hello {{$name}}</h3>
+<p>Hello {{$name}},</p>
 <p>Thank you for contacting Laravel Blog!</p>
