@@ -6,6 +6,9 @@ use App\Http\Controllers\PostController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\TagController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\ContactController;
+
+use Symfony\Component\HttpFoundation\Request;
 
 /*
 |--------------------------------------------------------------------------
@@ -20,14 +23,17 @@ use App\Http\Controllers\AdminController;
 
 Route::get('/', [PostController::class, 'index']);
 
-Route::get('/search', [PostController::class, 'search']);
-
 Route::resources([
     'category' => CategoryController::class,
     'tag' => TagController::class,
     'post' => PostController::class,
+    'contact' => ContactController::class
 ]);
 
 Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', AdminController::class)->name('dashboard');
 
 Route::get('/blog', [PostController::class, 'index']);
+
+Route::get('/search', [PostController::class, 'search']);
+
+// Route::get('/contact', [ContactController::class, 'index']);

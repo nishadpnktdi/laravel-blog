@@ -9,6 +9,7 @@
     "license": "MIT",
     "require": {
         "php": "^7.3",
+        "algolia/algoliasearch-client-php": "^2.7",
         "fideloper/proxy": "^4.2",
         "fruitcake/laravel-cors": "^2.0",
         "guzzlehttp/guzzle": "^7.0.1",
@@ -18,7 +19,7 @@
         "laravel/scout": "^8.3",
         "laravel/tinker": "^2.0",
         "livewire/livewire": "^2.0",
-        "teamtnt/laravel-scout-tntsearch-driver": "^10.0"
+        "yajra/laravel-datatables": "^1.5"
     },
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^2.8",

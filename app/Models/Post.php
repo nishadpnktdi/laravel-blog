@@ -11,8 +11,6 @@ class Post extends Model
     use HasFactory;
     use Searchable;
 
-    public $asYouType = true;
-
     public function user()
     {
         return $this->belongsTo('App\Models\User');
@@ -27,13 +25,5 @@ class Post extends Model
     {
         return $this->belongsToMany('App\Models\Tag');
     }
-
-    public function toSearchableArray()
-    {
-        $array = $this->toArray();
-
-        // Customize array...
-
-        return $array;
-    }
+    
 }

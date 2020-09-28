@@ -71,7 +71,7 @@ class CategoryController extends Controller
         $posts = Post::whereHas('category', function($query) use ($id){
             return $query->where('id', $id);
         })->latest()->paginate(6);
-        $latest = Post::limit(5)->get();
+        $latest = Post::limit(5)->latest()->get();
         $category=Category::find($id);
         return view('category/category')->with(compact("category","posts", "categories", "tags", "latest"));
     }

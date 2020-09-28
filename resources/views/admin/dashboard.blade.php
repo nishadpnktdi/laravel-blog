@@ -18,7 +18,7 @@
                   <tr>
                     <th>Featured Image</th>
                     <th>Title</th>
-                    <th>Status</th>
+                    <th>Author</th>
                     <th>Publishing date</th>
                     <th>Actions</th>
                   </tr>
@@ -37,7 +37,7 @@
                     <tr>
                       <td><img class="rounded-0" src="/images/{{$post->featured_image}}" /></td>
                       <td>{{$post->title}}</td>
-                      <td>{{$post->is_published}}</td>
+                      <td>{{$post->user->name}}</td>
                       <td>{{$post->created_at}}</td>
                       <td>
                         <a href="/post/{{ $post->id }}/edit" class="card-link">

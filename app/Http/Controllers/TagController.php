@@ -69,7 +69,7 @@ class TagController extends Controller
         $posts = Post::whereHas('tags', function($query) use ($id){
             return $query->where('id', $id);
         })->latest()->paginate(6);
-        $latest = Post::limit(5)->get();
+        $latest = Post::limit(5)->latest()->get();
         $tag = Tag::find($id);
         return view('tag/tag')->with(compact("tag","posts", "categories", "tags", "latest"));
     }

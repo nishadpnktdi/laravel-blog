@@ -14,14 +14,14 @@
       <!-- Latest Posts -->
       <main class="posts-listing col-lg-8">
         <div class="container">
-        <h3 class="h4 mb-4">Search results esults for "{{$keyword}}"</h3>
-        <hr>
+          <h3 class="h4 mb-4">Search results for "{{$keyword}}"</h3>
+          <hr>
           <div class="row">
             <!-- post -->
+            @if($results->count() != 0)
             @foreach($results as $post)
-            
+
             <div class="post col-xl-6">
-              @if($results)
               <div class="post-thumbnail"><a href="post/{{$post->id}}"><img src="/images/{{ $post->featured_image }}" alt="..." class="img-fluid"></a></div>
               <div class="post-details">
                 <div class="post-meta d-flex justify-content-between">
@@ -41,9 +41,13 @@
                   <div class="comments meta-last"><i class="icon-comment"></i>12</div>
                 </footer>
               </div>
-              @endif
             </div>
             @endforeach
+            @else
+            <div class="post col-xl-6">
+            <h5>No results found!</h5>
+            </div>
+            @endif
           </div>
           <!-- Pagination -->
           <nav aria-label="Page navigation example">

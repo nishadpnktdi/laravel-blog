@@ -25,7 +25,7 @@ class PostController extends Controller
         $tags = Tag::get();
         $categories = Category::withCount('posts')->get();
         $posts = Post::with('user', 'category')->latest()->paginate(6);
-        $latest = Post::limit(5)->get();
+        $latest = Post::limit(5)->latest()->get();
         return view('blog')->with(compact("posts", "categories", "tags", "latest"));
     }
 
@@ -85,7 +85,7 @@ class PostController extends Controller
     {
         $post = new Post();
         $post = $post->with('user')->find($id);
-        $latest = Post::limit(5)->get();
+        $latest = Post::limit(5)->latest()->get();
         $tags = Tag::get();
         $categories = Category::withCount('posts')->get();
 
@@ -198,13 +198,14 @@ class PostController extends Controller
             'search' => 'required'
         ]);
 
+        $query = $request->search;
+        
         $keyword = $request->search;
-
-        $latest = Post::limit(5)->get();
+        $latest = Post::limit(5)->latest()->get();
         $tags = Tag::get();
         $categories = Category::withCount('posts')->get();
 
-        $results = Post::search($keyword)->paginate(6);
+        $results = Post::search($query)->paginate(6);
 
         return view('search', compact('results','keyword', 'latest', 'tags', 'categories'));
     }
