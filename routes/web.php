@@ -36,4 +36,7 @@ Route::get('/blog', [PostController::class, 'index']);
 
 Route::get('/search', [PostController::class, 'search']);
 
-// Route::get('/contact', [ContactController::class, 'index']);
+Route::get('/contact-us', function ()
+{
+    return view('contact');
+});

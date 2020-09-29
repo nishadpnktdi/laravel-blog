@@ -2,12 +2,19 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\AdminNotification;
 use App\Mail\ThanksMail;
 use App\Models\Contact;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
 class ContactController extends Controller
 {
+
+    public function __construct()
+    {
+        $this->middleware('auth', ['except' => ['index']]);
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -15,7 +22,8 @@ class ContactController extends Controller
      */
     public function index()
     {
-        return view('contact');
+        $contacts = Contact::latest()->get();
+        return view('contact/contacts')->with(compact('contacts'));
     }
 
     /**
@@ -40,7 +48,8 @@ class ContactController extends Controller
             'name' => 'required',
             'email' => 'required|email',
             'phone' => 'required',
-            'message' => 'required'
+            'message' => 'required',
+            'g-recaptcha-response' => 'required|captcha',
         ]);
 
         $contact = new Contact;
@@ -54,9 +63,10 @@ class ContactController extends Controller
 
         $name = $request->name;
         $to_email = $request->email;
+        $message = $request->message;
   
         Mail::to($to_email)->send(new ThanksMail($name));
-        // Mail::to('nishad.pnktdi@gmail.com')->send(new ThanksMail($name));
+        Mail::to('nishad.pnktdi@gmail.com')->send(new AdminNotification($name,$to_email,$message));
 
         
         return back()->with('message', 'Thank you for contacting us!');
@@ -70,7 +80,7 @@ class ContactController extends Controller
      */
     public function show(Contact $contact)
     {
-        //
+        
     }
 
     /**
@@ -102,8 +112,15 @@ class ContactController extends Controller
      * @param  \App\Models\Contact  $contact
      * @return \Illuminate\Http\Response
      */
-    public function destroy(Contact $contact)
+    public function destroy($id)
     {
-        //
+        $contact = Contact::find($id);
+
+        $contact->delete();
+
+        return [
+            'message' => 'Contact Deleted',
+            'contact_count' => Contact::count()
+        ];
     }
 }
