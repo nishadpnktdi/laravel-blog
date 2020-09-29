@@ -24,7 +24,7 @@ class ContactController extends Controller
      */
     public function index(Request $request)
     {
-        $contacts = Contact::atest()->get();
+        $contacts = Contact::latest()->get();
         return view('contact/contacts')->with(compact('contacts'));
 
     }

@@ -24,13 +24,13 @@
                     <td>{{$tag->name}}</td>
                     <td>
                       <div class="button-group d-flex">
-                        <button type="button" class="btn btn-sm btn-primary mr-1 edit-tag" data-toggle="modal" id="editTagModal" data-id="{{ $tag->id }}" data-name="{{ $tag->name }}">Edit</button>
-
+                        <button type="button" class="btn btn-dark edit-tag" data-toggle="modal" id="editTagModal" data-id="{{ $tag->id }}" data-name="{{ $tag->name }}"><i class="mdi mdi-pencil"></i>Edit</button>
+                        <span class="pr-4"></span>
                         <form action="{{ route('tag.destroy', $tag->id) }}" method="POST">
                           @csrf
                           @method('DELETE')
 
-                          <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                          <button type="submit" class="btn btn-danger"><i class="mdi mdi-delete"></i>Delete</button>
                         </form>
                       </div>
                     </td>
@@ -101,7 +101,7 @@
         });
         $.ajax({
           type: "PATCH",
-          url: "tag/" + id,
+          url: "/tag/" + id,
           data: {
             "_token": "{{ csrf_token() }}",
             "name": name
