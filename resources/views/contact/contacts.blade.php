@@ -1,13 +1,14 @@
 @extends('admin.layout')
 
 @section('content')
+<link rel="stylesheet" href="https://cdn.datatables.net/1.10.22/css/jquery.dataTables.min.css" />
+<script src="https://cdn.datatables.net/1.10.22/js/jquery.dataTables.min.js" />
+</script>
+
 <div class="row">
   <div class="col-md-12">
     <div class="row">
       <div class="col-md-12 grid-margin">
-        <div id="delete-message" class="d-none alert alert-danger">
-          Contact deleted!
-        </div>
         <div class="card">
           <div class="card-body">
             <div class="d-flex justify-content-between">
@@ -62,27 +63,34 @@
 @push('scripts')
 <script>
   $('.delete-contact').on('click', function() {
-    let _that = $(this);
-    $.ajax({
-      url: '/contact/' + _that.data('id'),
-      type: 'DELETE',
-      data: {
-        "_token": "{{ csrf_token() }}",
-      },
-      success: function(result) {
-        // Do something with the result
-        $('#delete-message').removeClass('d-none');
-        $('#delete-message').html(result.message);
-        if (result.post_count == 0)
-          _that.closest('tr').html(`<td>No Data</td><td></td><td></td><td></td><td></td>`);
-        else
-          _that.closest('tr').remove();
+    swal({
+        title: "Are you sure?",
+        text: "Do you want to delete the entry?",
+        icon: "warning",
+        buttons: true,
+        dangerMode: true,
+      })
+      .then((willDelete) => {
+        if (willDelete) {
 
-        setTimeout(function() {
-          $('#delete-message').remove();
-        }, 5000);
-      }
-    });
+          let _that = $(this);
+          $.ajax({
+            url: '/contact/' + _that.data('id'),
+            type: 'DELETE',
+            data: {
+              "_token": "{{ csrf_token() }}",
+            },
+            success: function(result) {
+              swal("Entry successfully deleted!", {
+                icon: "success",
+                timer: 3000
+              }).then(function(){
+                location.reload();
+              })
+            }
+          });
+        }
+      })
   });
 </script>
 @endpush

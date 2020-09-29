@@ -7,12 +7,14 @@ use App\Mail\ThanksMail;
 use App\Models\Contact;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Mail;
+use Yajra\DataTables\Services\DataTable;
+
 class ContactController extends Controller
 {
 
     public function __construct()
     {
-        $this->middleware('auth', ['except' => ['index']]);
+        $this->middleware('auth', ['except' => ['index', 'store']]);
     }
 
     /**
@@ -20,10 +22,11 @@ class ContactController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $contacts = Contact::latest()->get();
+        $contacts = Contact::atest()->get();
         return view('contact/contacts')->with(compact('contacts'));
+
     }
 
     /**
