@@ -2,12 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Mail\AdminNotification;
-use App\Mail\ThanksMail;
+use App\Jobs\SendEmailJob;
 use App\Models\Contact;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Mail;
-use Yajra\DataTables\Services\DataTable;
+use App\Jobs\SendAdminMailJob;
 
 class ContactController extends Controller
 {
@@ -64,12 +62,8 @@ class ContactController extends Controller
 
         $contact->save();
 
-        $name = $request->name;
-        $to_email = $request->email;
-        $message = $request->message;
-  
-        Mail::to($to_email)->send(new ThanksMail($name));
-        Mail::to('nishad.pnktdi@gmail.com')->send(new AdminNotification($name,$to_email,$message));
+        dispatch(new SendEmailJob($contact));
+        dispatch(new SendAdminMailJob($contact));
 
         
         return back()->with('message', 'Thank you for contacting us!');
