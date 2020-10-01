@@ -15,7 +15,7 @@
               <h4 class="card-title mb-0">Contacts</h4>
             </div>
             <div class="table-responsive">
-              <table class="table table-striped table-hover">
+              <table class="table table-striped table-hover" id="data-table" style="width: 100%;">
                 <thead>
                   <tr>
                     <th>Name</th>
@@ -62,35 +62,46 @@
 
 @push('scripts')
 <script>
-  $('.delete-contact').on('click', function() {
-    swal({
-        title: "Are you sure?",
-        text: "Do you want to delete the entry?",
-        icon: "warning",
-        buttons: true,
-        dangerMode: true,
-      })
-      .then((willDelete) => {
-        if (willDelete) {
+  $(document).ready(function() {
+    $('#data-table').DataTable({
+      "paging": true,
+      "searching": true,
+      "ordering": true,
+      "autoWidth": true,
+      "processing": true,
+      "pageLength": 10,
+    });
 
-          let _that = $(this);
-          $.ajax({
-            url: '/contact/' + _that.data('id'),
-            type: 'DELETE',
-            data: {
-              "_token": "{{ csrf_token() }}",
-            },
-            success: function(result) {
-              swal("Entry successfully deleted!", {
-                icon: "success",
-                timer: 3000
-              }).then(function(){
-                location.reload();
-              })
-            }
-          });
-        }
-      })
+    $('.delete-contact').on('click', function() {
+      swal({
+          title: "Are you sure?",
+          text: "Do you want to delete the entry?",
+          icon: "warning",
+          buttons: true,
+          dangerMode: true,
+        })
+        .then((willDelete) => {
+          if (willDelete) {
+
+            let _that = $(this);
+            $.ajax({
+              url: '/contact/' + _that.data('id'),
+              type: 'DELETE',
+              data: {
+                "_token": "{{ csrf_token() }}",
+              },
+              success: function(result) {
+                swal("Entry successfully deleted!", {
+                  icon: "success",
+                  timer: 3000
+                }).then(function() {
+                  location.reload();
+                })
+              }
+            });
+          }
+        })
+    });
   });
 </script>
 @endpush
