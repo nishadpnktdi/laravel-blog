@@ -5,6 +5,11 @@
   <div class="col-md-8">
     <div class="row">
       <div class="col-md-12 grid-margin">
+        @if (session('message'))
+        <div class="alert alert-danger mt-3">
+          {{ session('message') }}
+        </div>
+        @endif
         <div class="card">
           <div class="card-body">
             <div class="d-flex justify-content-between">
@@ -26,12 +31,11 @@
                       <div class="button-group d-flex">
                         <button type="button" class="btn btn-dark edit-tag" data-toggle="modal" id="editTagModal" data-id="{{ $tag->id }}" data-name="{{ $tag->name }}"><i class="mdi mdi-pencil"></i>Edit</button>
                         <span class="pr-4"></span>
-                        <form action="{{ route('tag.destroy', $tag->id) }}" method="POST">
-                          @csrf
-                          @method('DELETE')
+                        @can('isAdmin')
 
-                          <button type="submit" class="btn btn-danger"><i class="mdi mdi-delete"></i>Delete</button>
-                        </form>
+                        <button type="submit" data-id="{{ $tag->id }}" class="btn btn-danger delete-tag"><i class="mdi mdi-delete"></i>Delete</button>
+
+                        @endcan
                       </div>
                     </td>
                   </tr>
@@ -75,57 +79,99 @@
 @endsection
 @push('scripts')
 <script type="text/javascript">
-  $(".edit-tag").click(function() {
-    swal({
-        title: 'Type new Tag name',
-        content: {
-          element: 'input',
-          attributes: {
-            placeholder: $(this).data('name')
-          }
-        },
-        button: {
-          text: "Update",
-          closeModal: false,
-        },
-      })
-      .then(name => {
-        if (!name)
-          return swal.close();
+  $(document).ready(function() {
 
-        var id = $(this).data('id');
-        $.ajaxSetup({
-          headers: {
-            'X-CSRF-TOKEN': jQuery('meta[name="csrf-token"]').attr('content')
-          }
-        });
-        $.ajax({
-          type: "PATCH",
-          url: "/tag/" + id,
-          data: {
-            "_token": "{{ csrf_token() }}",
-            "name": name
+    $(".edit-tag").click(function() {
+      swal({
+          title: 'Type new Tag name',
+          content: {
+            element: 'input',
+            attributes: {
+              placeholder: $(this).data('name')
+            }
           },
-          success: function(response) {
-            console.log(response);
-            swal({
-              title: "Successfully updated",
-              icon: "success",
-              timer: 5000
-            }).then(function() {
-              location.reload();
+          button: {
+            text: "Update",
+            closeModal: false,
+          },
+        })
+        .then(name => {
+          if (!name)
+            return swal.close();
+
+          var id = $(this).data('id');
+          $.ajaxSetup({
+            headers: {
+              'X-CSRF-TOKEN': jQuery('meta[name="csrf-token"]').attr('content')
+            }
+          });
+          $.ajax({
+            type: "PATCH",
+            url: "/tag/" + id,
+            data: {
+              "_token": "{{ csrf_token() }}",
+              "name": name
+            },
+            success: function(response) {
+              console.log(response);
+              swal({
+                title: "Successfully updated",
+                icon: "success",
+                timer: 5000
+              }).then(function() {
+                location.reload();
+              });
+            },
+            error: function(data) {
+              swal({
+                title: "Failed to update",
+                text: data.responseJSON['errors']['name'][0],
+                icon: "error",
+              })
+            }
+          });
+
+        });
+    });
+
+    $('.delete-tag').on('click', function() {
+      swal({
+          title: "Are you sure?",
+          text: "Do you want to delete the entry?",
+          icon: "warning",
+          buttons: true,
+          dangerMode: true,
+        })
+        .then((willDelete) => {
+          if (willDelete) {
+
+            let _that = $(this);
+            $.ajax({
+              url: '/tag/' + _that.data('id'),
+              type: 'DELETE',
+              data: {
+                "_token": "{{ csrf_token() }}",
+              },
+              success: function(result) {
+                swal("Tag successfully deleted!", {
+                  icon: "success",
+                  timer: 3000
+                }).then(function() {
+                  location.reload();
+                })
+              },
+              error: function(data) {
+                swal({
+                  title: "Unable to delete!",
+                  text: data.responseJSON['errors']['name'][0],
+                  icon: "error",
+                })
+              }
             });
-          },
-          error: function(data) {
-            swal({
-              title: "Failed to update",
-              text: data.responseJSON['errors']['name'][0],
-              icon: "error",
-            })
           }
-        });
+        })
+    });
 
-      });
   });
 </script>
 @endpush

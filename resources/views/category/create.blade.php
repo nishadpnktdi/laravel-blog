@@ -26,12 +26,11 @@
                       <div class="button-group d-flex">
                         <button type="button" class="btn btn-dark edit-category" data-toggle="modal" id="editCategoryModal" data-id="{{ $category->id }}" data-name="{{ $category->name }}"><i class="mdi mdi-pencil"></i>Edit</button>
                         <span class="pr-4"></span>
-                        <form action="{{ route('category.destroy', $category->id) }}" method="POST">
-                          @csrf
-                          @method('DELETE')
+                        @can('isAdmin')
 
-                          <button type="submit" class="btn btn-danger"><i class="mdi mdi-delete"></i>Delete</button>
-                        </form>
+                        <button type="submit" data-id="{{$category->id}}" class="btn btn-danger delete-category"><i class="mdi mdi-delete"></i>Delete</button>
+
+                        @endcan
                       </div>
                     </td>
                   </tr>
@@ -75,57 +74,97 @@
 @endsection
 @push('scripts')
 <script type="text/javascript">
-  $(".edit-category").click(function() {
-    swal({
-        title: 'Type new category name',
-        content: {
-          element: 'input',
-          attributes: {
-            placeholder: $(this).data('name')
-          }
-        },
-        button: {
-          text: "Update",
-          closeModal: false,
-        },
-      })
-      .then(name => {
-        if (!name)
-          return swal.close();
-
-        var id = $(this).data('id');
-        $.ajaxSetup({
-          headers: {
-            'X-CSRF-TOKEN': jQuery('meta[name="csrf-token"]').attr('content')
-          }
-        });
-        $.ajax({
-          type: "PATCH",
-          url: "/category/" + id,
-          data: {
-            "_token": "{{ csrf_token() }}",
-            "name": name
+  $(document).ready(function() {
+    $(".edit-category").click(function() {
+      swal({
+          title: 'Type new category name',
+          content: {
+            element: 'input',
+            attributes: {
+              placeholder: $(this).data('name')
+            }
           },
-          success: function(response) {
-            console.log(response);
-            swal({
-              title: "Successfully updated",
-              icon: "success",
-              timer: 5000
-            }).then(function() {
-              location.reload();
+          button: {
+            text: "Update",
+            closeModal: false,
+          },
+        })
+        .then(name => {
+          if (!name)
+            return swal.close();
+
+          var id = $(this).data('id');
+          $.ajaxSetup({
+            headers: {
+              'X-CSRF-TOKEN': jQuery('meta[name="csrf-token"]').attr('content')
+            }
+          });
+          $.ajax({
+            type: "PATCH",
+            url: "/category/" + id,
+            data: {
+              "_token": "{{ csrf_token() }}",
+              "name": name
+            },
+            success: function(response) {
+              console.log(response);
+              swal({
+                title: "Successfully updated",
+                icon: "success",
+                timer: 5000
+              }).then(function() {
+                location.reload();
+              });
+            },
+            error: function(data) {
+              swal({
+                title: "Failed to update",
+                text: data.responseJSON['errors']['name'][0],
+                icon: "error",
+              })
+            }
+          });
+
+        });
+    });
+
+    $('.delete-category').on('click', function() {
+      swal({
+          title: "Are you sure?",
+          text: "Do you want to delete the entry?",
+          icon: "warning",
+          buttons: true,
+          dangerMode: true,
+        })
+        .then((willDelete) => {
+          if (willDelete) {
+
+            let _that = $(this);
+            $.ajax({
+              url: '/category/' + _that.data('id'),
+              type: 'DELETE',
+              data: {
+                "_token": "{{ csrf_token() }}",
+              },
+              success: function(result) {
+                swal("Category successfully deleted!", {
+                  icon: "success",
+                  timer: 3000
+                }).then(function() {
+                  location.reload();
+                })
+              },
+              error: function(data) {
+                swal({
+                  title: "Unable to delete!",
+                  text: data.responseJSON['errors']['name'][0],
+                  icon: "error",
+                })
+              }
             });
-          },
-          error: function(data) {
-            swal({
-              title: "Failed to update",
-              text: data.responseJSON['errors']['name'][0],
-              icon: "error",
-            })
           }
-        });
-
-      });
+        })
+    });
   });
 </script>
 @endpush

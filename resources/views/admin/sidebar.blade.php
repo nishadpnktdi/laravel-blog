@@ -31,11 +31,19 @@
               <span class="menu-title">Tags</span>
             </a>
           </li>
+          @can('isAdmin')
           <li class="nav-item">
             <a class="nav-link" href="/contact">
               <i class="menu-icon typcn typcn-th-large-outline"></i>
               <span class="menu-title">Contacts</span>
             </a>
           </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/user/">
+              <i class="menu-icon typcn typcn-th-large-outline"></i>
+              <span class="menu-title">Users</span>
+            </a>
+          </li>
+          @endcan
         </ul>
       </nav>

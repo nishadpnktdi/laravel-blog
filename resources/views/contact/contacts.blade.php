@@ -70,37 +70,40 @@
       "autoWidth": true,
       "processing": true,
       "pageLength": 10,
-    });
 
-    $('.delete-contact').on('click', function() {
-      swal({
-          title: "Are you sure?",
-          text: "Do you want to delete the entry?",
-          icon: "warning",
-          buttons: true,
-          dangerMode: true,
-        })
-        .then((willDelete) => {
-          if (willDelete) {
+      "fnDrawCallback": function(oSettings) {
 
-            let _that = $(this);
-            $.ajax({
-              url: '/contact/' + _that.data('id'),
-              type: 'DELETE',
-              data: {
-                "_token": "{{ csrf_token() }}",
-              },
-              success: function(result) {
-                swal("Entry successfully deleted!", {
-                  icon: "success",
-                  timer: 3000
-                }).then(function() {
-                  location.reload();
-                })
+        $('.delete-contact').on('click', function() {
+          swal({
+              title: "Are you sure?",
+              text: "Do you want to delete the entry?",
+              icon: "warning",
+              buttons: true,
+              dangerMode: true,
+            })
+            .then((willDelete) => {
+              if (willDelete) {
+
+                let _that = $(this);
+                $.ajax({
+                  url: '/contact/' + _that.data('id'),
+                  type: 'DELETE',
+                  data: {
+                    "_token": "{{ csrf_token() }}",
+                  },
+                  success: function(result) {
+                    swal("Entry successfully deleted!", {
+                      icon: "success",
+                      timer: 3000
+                    }).then(function() {
+                      location.reload();
+                    })
+                  }
+                });
               }
-            });
-          }
-        })
+            })
+        });
+      }
     });
   });
 </script>

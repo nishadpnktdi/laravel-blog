@@ -7,7 +7,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\TagController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ContactController;
-
+use App\Http\Controllers\UserController;
 use Symfony\Component\HttpFoundation\Request;
 
 /*
@@ -27,7 +27,8 @@ Route::resources([
     'category' => CategoryController::class,
     'tag' => TagController::class,
     'post' => PostController::class,
-    'contact' => ContactController::class
+    'contact' => ContactController::class,
+    'user' => UserController::class,
 ]);
 
 Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', AdminController::class)->name('dashboard');

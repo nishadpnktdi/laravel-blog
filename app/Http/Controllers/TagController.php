@@ -6,6 +6,7 @@ use App\Models\Category;
 use App\Models\Post;
 use App\Models\Tag;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class TagController extends Controller
 {
@@ -15,7 +16,7 @@ class TagController extends Controller
         $this->middleware('auth', ['except' => ['show']]);
     }
 
-    
+
     /**
      * Display a listing of the resource.
      *
@@ -34,7 +35,7 @@ class TagController extends Controller
     public function create()
     {
         $tags = Tag::get();
-        return view('tag/create')->with('tags', $tags);
+        return view('/tag/create')->with('tags', $tags);
     }
 
     /**
@@ -53,7 +54,7 @@ class TagController extends Controller
         $tag->name = $request->name;
         $tag->save();
 
-        return redirect()->route('tag.index')->withSuccess('Tag created!');
+        return redirect()->route('tag.create')->with('message','Tag created!');
     }
 
     /**
@@ -66,12 +67,12 @@ class TagController extends Controller
     {
         $tags = Tag::get();
         $categories = Category::withCount('posts')->get();
-        $posts = Post::whereHas('tags', function($query) use ($id){
+        $posts = Post::whereHas('tags', function ($query) use ($id) {
             return $query->where('id', $id);
         })->latest()->paginate(6);
         $latest = Post::limit(5)->latest()->get();
         $tag = Tag::find($id);
-        return view('tag/tag')->with(compact("tag","posts", "categories", "tags", "latest"));
+        return view('tag/tag')->with(compact("tag", "posts", "categories", "tags", "latest"));
     }
 
     /**
@@ -113,10 +114,16 @@ class TagController extends Controller
      */
     public function destroy($id)
     {
-        $tag = new Tag();
+        if (Gate::allows('isAdmin')) {
+            $tag = Tag::find($id);
 
-        $tag->where('id', $id)->delete();
+            $tag->delete();
 
-        return redirect()->route('tag.index')->withSuccess('Tag deleted!');
+            return [
+                'message' => 'Tag Deleted',
+                'tag_count' => Tag::count()
+            ];
+        }
+        return back()->with('message', "You're not Authorized!");
     }
 }

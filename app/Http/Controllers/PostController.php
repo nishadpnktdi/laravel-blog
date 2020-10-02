@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Post;
 use App\Models\Category;
 use App\Models\Tag;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Http\Request;
 
 class PostController extends Controller
@@ -182,14 +183,18 @@ class PostController extends Controller
      */
     public function destroy($id)
     {
-        $post = Post::find($id);
+        if (Gate::allows('isAdmin')) {
+            $post = Post::find($id);
 
-        $post->delete();
+            $post->delete();
 
-        return [
-            'message' => 'Post Deleted',
-            'post_count' => Post::count()
-        ];
+            return [
+                'message' => 'Post Deleted',
+                'post_count' => Post::count()
+            ];
+        } else {
+            return back()->with('message', "You're not Authorized!");
+        }
     }
 
     public function search(Request $request)
@@ -199,7 +204,7 @@ class PostController extends Controller
         ]);
 
         $query = $request->search;
-        
+
         $keyword = $request->search;
         $latest = Post::limit(5)->latest()->get();
         $tags = Tag::get();
@@ -207,6 +212,6 @@ class PostController extends Controller
 
         $results = Post::search($query)->paginate(6);
 
-        return view('search', compact('results','keyword', 'latest', 'tags', 'categories'));
+        return view('search', compact('results', 'keyword', 'latest', 'tags', 'categories'));
     }
 }

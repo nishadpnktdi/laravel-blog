@@ -6,6 +6,7 @@ use App\Jobs\SendEmailJob;
 use App\Models\Contact;
 use Illuminate\Http\Request;
 use App\Jobs\SendAdminMailJob;
+use Illuminate\Support\Facades\Gate;
 
 class ContactController extends Controller
 {
@@ -22,9 +23,13 @@ class ContactController extends Controller
      */
     public function index(Request $request)
     {
-        $contacts = Contact::latest()->get();
-        return view('contact/contacts')->with(compact('contacts'));
+        if (Gate::allows('isAdmin')) {
 
+            $contacts = Contact::latest()->get();
+            return view('contact/contacts')->with(compact('contacts'));
+        } else {
+            return back()->with('message', "You're not Authorized!");
+        }
     }
 
     /**
@@ -65,7 +70,7 @@ class ContactController extends Controller
         dispatch(new SendEmailJob($contact));
         dispatch(new SendAdminMailJob($contact));
 
-        
+
         return back()->with('message', 'Thank you for contacting us!');
     }
 
@@ -77,7 +82,6 @@ class ContactController extends Controller
      */
     public function show(Contact $contact)
     {
-        
     }
 
     /**
@@ -111,13 +115,16 @@ class ContactController extends Controller
      */
     public function destroy($id)
     {
-        $contact = Contact::find($id);
+        if (Gate::allows('isAdmin')) {
+            $contact = Contact::find($id);
 
-        $contact->delete();
+            $contact->delete();
 
-        return [
-            'message' => 'Contact Deleted',
-            'contact_count' => Contact::count()
-        ];
+            return [
+                'message' => 'Contact Deleted',
+                'contact_count' => Contact::count()
+            ];
+        }
+        return back()->with('message', "You're not Authorized!");
     }
 }

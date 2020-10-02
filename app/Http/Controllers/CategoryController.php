@@ -8,6 +8,7 @@ use App\Models\Tag;
 
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Gate;
 
 class CategoryController extends Controller
 {
@@ -25,7 +26,6 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        
     }
 
     /**
@@ -55,7 +55,7 @@ class CategoryController extends Controller
         $category->name = $request->name;
         $category->save();
 
-        return redirect()->route('category.index')->withSuccess('Category created!');
+        return redirect()->back()->withSuccess('Category created!');
     }
 
     /**
@@ -68,12 +68,12 @@ class CategoryController extends Controller
     {
         $tags = Tag::get();
         $categories = Category::withCount('posts')->get();
-        $posts = Post::whereHas('category', function($query) use ($id){
+        $posts = Post::whereHas('category', function ($query) use ($id) {
             return $query->where('id', $id);
         })->latest()->paginate(6);
         $latest = Post::limit(5)->latest()->get();
-        $category=Category::find($id);
-        return view('category/category')->with(compact("category","posts", "categories", "tags", "latest"));
+        $category = Category::find($id);
+        return view('category/category')->with(compact("category", "posts", "categories", "tags", "latest"));
     }
 
     /**
@@ -99,10 +99,10 @@ class CategoryController extends Controller
         $validatedData = $this->validate($request, [
             'name'  => 'required|min:3|max:255|string|unique:categories'
         ]);
-            $category = Category::find($id);
-            $category->name = $request->name;
-            $category->name = $validatedData['name'];
-            $category->save();
+        $category = Category::find($id);
+        $category->name = $request->name;
+        $category->name = $validatedData['name'];
+        $category->save();
 
         return response(200);
     }
@@ -115,10 +115,16 @@ class CategoryController extends Controller
      */
     public function destroy($id)
     {
-        $category = new Category();
+        if (Gate::allows('isAdmin')) {
+            $category = Category::find($id);
 
-        $category->where('id', $id)->delete();
+            $category->delete();
 
-        return redirect()->route('category.index')->withSuccess('Category deleted!');
+            return [
+                'message' => 'Category Deleted',
+                'category_count' => Category::count()
+            ];
+        }
+        return back()->with('message', "You're not Authorized!");
     }
 }
