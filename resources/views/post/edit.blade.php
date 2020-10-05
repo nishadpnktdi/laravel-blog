@@ -1,7 +1,7 @@
 @extends('admin.layout')
 
 @section('content')
-<form action="/post/{{$post->id}}" method="POST" enctype="multipart/form-data">
+<form action="" method="POST" enctype="multipart/form-data">
   @method('PATCH')
   @csrf
   <div class="row">

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 
@@ -44,7 +45,22 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        if (Gate::allows('isAdmin')) {
+
+            $request->validate([
+                'name'=> 'required|string|max:255',
+                'email'=> 'required|string|email|max:255|unique:users',
+                'password'=>'required|string|confirmed',
+            ]);
+
+            return User::create([
+                'name'=>$request->name,
+                'email'=>$request->email,
+                'password'=>Hash::make($request->password)
+            ]);
+        }
+
+        return back()->with('message', "You're not Authorized!");
     }
 
     /**
@@ -64,9 +80,10 @@ class UserController extends Controller
      * @param  \App\Models\User  $user
      * @return \Illuminate\Http\Response
      */
-    public function edit(User $user)
+    public function edit($id)
     {
-        //
+        $user = User::find($id);
+        return $user;
     }
 
     /**
