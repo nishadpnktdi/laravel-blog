@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
@@ -48,15 +49,15 @@ class UserController extends Controller
         if (Gate::allows('isAdmin')) {
 
             $request->validate([
-                'name'=> 'required|string|max:255',
-                'email'=> 'required|string|email|max:255|unique:users',
-                'password'=>'required|string|confirmed',
+                'name' => 'required|string|max:255',
+                'email' => 'required|string|email|max:255|unique:users',
+                'password' => 'required|string|confirmed',
             ]);
 
             return User::create([
-                'name'=>$request->name,
-                'email'=>$request->email,
-                'password'=>Hash::make($request->password)
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => Hash::make($request->password)
             ]);
         }
 
@@ -93,9 +94,50 @@ class UserController extends Controller
      * @param  \App\Models\User  $user
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, User $user)
+    public function update(Request $request, $id)
     {
-        //
+
+        $user = User::find($id);
+
+        $request->validate([
+            'name'     => 'required',
+            'email'    => 'required|email|unique:users,email,'.$id,
+            'password' => 'sometimes|confirmed',
+            'role'     => 'required',
+            'image'    => 'image|nullable'
+        ]);
+
+        $name     = $request->name;
+        $email    = $request->email;
+        $password = $request->password;
+        $role     = $request->role;
+        $image    = $request->image;
+
+        if ($request->hasFile('image')) {
+            return response('file here');
+            $imageName = time() . '_' . $request->file('image')->getClientOriginalName();
+
+            $image->move(storage_path('profile-photos'), $imageName);
+
+            $user->profile_photo_path = 'profile-photos/' + $imageName;
+
+        }
+
+        if (!$password == '') {
+            if (!$email == '') {
+
+                $user->email = $email;
+            }
+
+            $user->password = $password;
+        }
+
+        $user->email = $email;
+        $user->name = $name;
+        $user->role = $role;
+        $user->save();
+        return response('success');
+
     }
 
     /**

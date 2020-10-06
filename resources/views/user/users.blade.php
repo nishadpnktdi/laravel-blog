@@ -30,14 +30,14 @@
             @enderror
           </div>
           <div class="form-group">
-            <label for="email">Password</label>
+            <label for="password">Password</label>
             <input type="password" class="form-control" name="password" value="{{ old('password') }}" required>
             @error('password')
             <div class="text-danger">{{ $message }}</div>
             @enderror
           </div>
           <div class="form-group">
-            <label for="email">Confirm password</label>
+            <label for="confirm_password">Confirm password</label>
             <input type="password" class="form-control" name="password_confirmation" value="{{ old('confirm-passoword') }}" required>
             @error('confirm-password')
             <div class="text-danger">{{ $message }}</div>
@@ -64,12 +64,13 @@
         </button>
       </div>
       <div class="modal-body">
-        <form id="edit-user">
+        <meta name="csrf-token" content="{{ csrf_token() }}" />
+        <form class="edit-user" id="update-user-form" enctype="multipart/form-data">
           @csrf
           <div class="form-group">
             <label for="profile-image">Profile Image</label>
             <div class="input-group col-xs-12">
-            <input type="file" name="image" id="image" class="dropify" data-height="200" data-default-file="/storage/{{ old('profile_photo_path') }}" />
+              <input type="file" name="image" id="image" class="dropify" data-height="200" />
             </div>
             @error('image')
             <div class="text-danger">{{ $message }}</div>
@@ -101,15 +102,15 @@
             @enderror
           </div>
           <div class="form-group">
-            <label for="email">Password</label>
-            <input type="password" class="form-control" name="password" id="password" value="{{ old('password') }}" required>
+            <label for="password">Password</label>
+            <input type="password" class="form-control" name="password" id="password" value="{{ old('password') }}">
             @error('password')
             <div class="text-danger">{{ $message }}</div>
             @enderror
           </div>
           <div class="form-group">
-            <label for="email">Confirm password</label>
-            <input type="password" class="form-control" name="password_confirmation" id="password_confirmation" value="{{ old('confirm-passoword') }}" required>
+            <label for="confirm_password">Confirm password</label>
+            <input type="password" class="form-control" name="password_confirmation" id="password_confirmation" value="{{ old('confirm-passoword') }}">
             @error('confirm-password')
             <div class="text-danger">{{ $message }}</div>
             @enderror
@@ -118,7 +119,7 @@
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <button type="submit" class="btn btn-primary edit-user">Save</button>
+        <button type="submit" class="btn btn-primary save-user">Save</button>
       </div>
     </div>
   </div>
@@ -175,9 +176,9 @@
                       <td>{{$user->email}}</td>
                       <td>{{$user->role}}</td>
                       <td>
-                      @can('isAdmin')
-                          <button type="button" data-id="{{ $user->id }}" class="btn btn-dark edit-user">
-                            <i class="mdi mdi-pencil"></i>Edit</button>
+                        @can('isAdmin')
+                        <button type="button" data-id="{{ $user->id }}" class="btn btn-dark edit-user">
+                          <i class="mdi mdi-pencil"></i>Edit</button>
 
                         <button type="button" data-id="{{ $user->id }}" class="btn btn-danger delete-user">
                           <i class="mdi mdi-delete"></i>Delete</button>
@@ -201,7 +202,6 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Dropify/0.2.2/js/dropify.js" integrity="sha512-hJsxoiLoVRkwHNvA5alz/GVA+eWtVxdQ48iy4sFRQLpDrBPn6BFZeUcW4R4kU+Rj2ljM9wHwekwVtsb0RY/46Q==" crossorigin="anonymous"></script>
 <script>
   $(document).ready(function() {
-    $('.dropify').dropify();
     $('#data-table').DataTable({
       "paging": true,
       "searching": true,
@@ -211,7 +211,7 @@
       "pageLength": 10,
       "fnDrawCallback": function(oSettings) {
 
-        $('.delete-user').on('click', function() {
+        $('.delete-user').click(function() {
 
           swal({
               title: "Are you sure?",
@@ -252,7 +252,7 @@
       }
     });
 
-    $('.create-user').on('click', function() {
+    $('.create-user').click(function() {
       $.ajax({
         url: '/user',
         type: 'POST',
@@ -260,15 +260,15 @@
         success: function(result) {
           swal("User created successfully!", {
             icon: "success",
-            timer:3000
+            timer: 3000
           }).then(function() {
             location.reload();
           })
         },
         error: function(data) {
-          var err='';
-          for(e in data.responseJSON['errors']){
-            err +=data.responseJSON['errors'][e] + '\n';
+          var err = '';
+          for (e in data.responseJSON['errors']) {
+            err += data.responseJSON['errors'][e] + '\n';
           }
           swal({
             title: "Unable to create user!",
@@ -281,7 +281,7 @@
 
     });
 
-    $('.edit-user').on('click', function() {
+    $('.edit-user').click(function() {
       $.ajax({
         url: '/user/' + $(this).data('id') + '/edit',
         type: 'GET',
@@ -297,9 +297,76 @@
           $("#email").val(email);
           $("#password").val(password);
           $('#role').val(role).selected;
-          $('#image').attr("data-default-file", "/storage/"+profile_image);
+          $('.dropify').dropify({
+            defaultFile: '/storage/' + profile_image
+          });
 
           $('#edit-user-modal').modal('show');
+
+          var drEvent = $('#image').dropify();
+          drEvent = drEvent.data('dropify');
+          drEvent.resetPreview();
+          drEvent.clearElement();
+          drEvent.settings.defaultFile = '/storage/' + profile_image;
+          drEvent.destroy();
+          drEvent.init();
+          $('.dropify#image').dropify({
+            defaultFile: '/storage/' + profile_image,
+          });
+
+          $('.save-user').click(function() {
+            $.ajaxSetup({
+              headers: {
+                'X-CSRF-TOKEN': jQuery('meta[name="csrf-token"]').attr('content')
+              }
+            });
+            name  = $("#name").val();
+            email = $("#email").val();
+            password = $("#password").val();
+            role = $("#role").val();
+            image = $("#image").val();
+
+            let myForm = document.querySelector('form');
+            let formData = new FormData();            
+            formData.append('name' , name);
+            formData.append('email', email);
+            formData.append('password', password);
+            formData.append('role', role);
+            // formData.append('image', image);
+            console.log(formData.entries);
+
+            $.ajax({
+              type: "PATCH",
+              url: "/user/" + result.id,
+              enctype: 'multipart/form-data',
+              processData: false,
+              // contentType: false,
+              data: formData,
+              success: function(response) {
+                console.log(response);
+                swal({
+                  title: "User successfully updated",
+                  icon: "success",
+                  timer: 5000
+                }).then(function() {
+                  // location.reload();
+                });
+              },
+              error: function(data) {
+                var err = '';
+                for (e in data.responseJSON['errors']) {
+                  err += data.responseJSON['errors'][e] + '\n';
+                }
+                swal({
+                  title: "Unable to update user!",
+                  icon: "error",
+                  text: err,
+                })
+              }
+            });
+
+          })
+
         },
         error: function(data) {
           console.log(data);
