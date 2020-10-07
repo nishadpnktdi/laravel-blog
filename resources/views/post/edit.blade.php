@@ -1,9 +1,9 @@
 @extends('admin.layout')
 
 @section('content')
-<form action="" method="POST" enctype="multipart/form-data">
-  @method('PATCH')
+<form action="/post/{{$post->id}}" method="POST" enctype="multipart/form-data">
   @csrf
+  @method('PATCH')
   <div class="row">
     <div class="col-md-8 d-flex align-items-stretch grid-margin">
       <div class="row flex-grow">
@@ -49,8 +49,11 @@
               <h5 class="card-title">Featured Image</h5>
               <div class="form-group">
                 <div class="input-group col-xs-12">
-                  <input type="file" name="image" class="dropify" data-default-file="/images/{{ $post->featured_image }}" />
+                  <input type="file" name="image[]" class="dropify" data-default-file="/images/{{ $post->featured_image }}" multiple/>
                 </div>
+                @error('image')
+                <div class="text-danger">{{ $message }}</div>
+                @enderror
 
 
               </div>
@@ -92,7 +95,11 @@
   $(document).ready(function() {
     $('.select-category').select2();
     $('.select-tags-basic-multiple').select2();
-    $('.dropify').dropify();
+    $('.dropify').dropify(
+      {
+        
+      }
+    );
   });
 </script>
 @endpush

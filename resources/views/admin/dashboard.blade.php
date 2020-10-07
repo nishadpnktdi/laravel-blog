@@ -29,7 +29,7 @@
                 </thead>
                 <tbody>
                   @if ($posts->count() < 1) <tr>
-                    <td>No Data</td>
+                    <td>No Posts</td>
                     <td></td>
                     <td></td>
                     <td></td>
@@ -42,7 +42,6 @@
                       <td><img class="rounded-0" src="/images/{{$post->featured_image}}" /></td>
                       <td>{{$post->title}}</td>
                       <td>{{$post->user->name}}</td>
-                      <td>{{$post->user->id}}</td>
                       <td>{{$post->created_at}}</td>
                       <td>
                         <a href="/post/{{ $post->id }}/edit" class="card-link">

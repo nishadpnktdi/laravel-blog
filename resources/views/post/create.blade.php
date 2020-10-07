@@ -50,7 +50,7 @@
               <h5 class="card-title">Featured Image</h5>
               <div class="form-group">
                 <div class="input-group col-xs-12">
-                  <input type="file" name="image" value="{{ old('image') }}" class="dropify" />
+                  <input type="file" name="image" value="{{ old('image') }}" class="dropify"/>
                   @error('image')
                 <div class="text-danger">{{ $message }}</div>
                 @enderror

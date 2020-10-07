@@ -7,6 +7,8 @@ use App\Models\Category;
 use App\Models\Tag;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
+
 
 class PostController extends Controller
 {
@@ -132,39 +134,30 @@ class PostController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-            'title' => 'required',
-            'author' => 'required',
-            'content' => 'required',
+            'title'    => 'required',
+            'author'   => 'required',
+            'content'  => 'required',
             'category' => 'required',
-            'image' => 'required|mimes:jpeg,png,jpg,gif|max:2048'
         ]);
 
-        $post = new Post();
+        $post = Post::find($id);
 
-        $title = $request->title;
-        $author = $request->author;
-        $content = $request->content;
-        $category = $request->category;
+        $post->title    = $request->title;
+        $post->user_id  = $request->author;
+        $post->content  = $request->content;
+        $post->category_id = $request->category;
 
         if ($request->hasFile('image')) {
-            $imageName = time() . '_' . $request->file('image')->getClientOriginalName();
-            $request->image->move(public_path('images'), $imageName);
 
-            $post->where('id', $id)->update([
-                'title' => $title,
-                'user_id' => $author,
-                'content' => $content,
-                'category_id' => $category,
-                'featured_image' => $imageName
-            ]);
+            foreach ($request->image as $image) {
+
+                $imageName = time() . '_' . $image->getClientOriginalName();
+                $image->move(public_path('images'), $imageName);
+                $post->featured_image = $imageName;
+            }
         }
 
-        $post->where('id', $id)->update([
-            'title' => $title,
-            'user_id' => $author,
-            'content' => $content,
-            'category_id' => $category,
-        ]);
+        $post->save();
 
         if (isset($request->tags)) {
             Post::find($id)->tags()->sync($request->tags);
