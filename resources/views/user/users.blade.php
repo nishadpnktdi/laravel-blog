@@ -65,31 +65,29 @@
       </div>
       <div class="modal-body">
         <meta name="csrf-token" content="{{ csrf_token() }}" />
-        <form class="edit-user" id="update-user-form" enctype="multipart/form-data">
+        <form class="update-user-form" id="edit-user" enctype="multipart/form-data">
           @csrf
           <div class="form-group">
             <label for="profile-image">Profile Image</label>
             <div class="input-group col-xs-12">
-              <input type="file" name="image" id="image" class="dropify" data-height="200" />
+              <!-- <input type="file" name="image" id="image" class="dropify" data-height="200" /> -->
+              <img id="profile-image" width="150" />
             </div>
-            @error('image')
+            <!-- @error('image')
             <div class="text-danger">{{ $message }}</div>
-            @enderror
+            @enderror -->
+
           </div>
           <div class="form-group">
             <label for="name">Full Name</label>
             <input type="text" class="form-control" name="name" id="name" value="{{ old('name') }}" required>
-            @error('name')
-            <div class="text-danger">{{ $message }}</div>
-            @enderror
           </div>
+
           <div class="form-group">
             <label for="email">Email</label>
             <input type="email" class="form-control" name="email" id="email" value="{{ old('email') }}" required>
-            @error('email')
-            <div class="text-danger">{{ $message }}</div>
-            @enderror
           </div>
+
           <div class="form-group">
             <label for="role">Role</label>
             <select class="form-control" name="role" id="role" value="{{ old('role') }}" required>
@@ -97,42 +95,37 @@
               <option value="editor">Editor</option>
               <option value="author">Author</option>
             </select>
-            @error('role')
-            <div class="text-danger">{{ $message }}</div>
-            @enderror
           </div>
+
           <div class="form-group">
             <label for="password">Password</label>
             <input type="password" class="form-control" name="password" id="password" value="{{ old('password') }}">
-            @error('password')
-            <div class="text-danger">{{ $message }}</div>
-            @enderror
           </div>
+
           <div class="form-group">
             <label for="confirm_password">Confirm password</label>
             <input type="password" class="form-control" name="password_confirmation" id="password_confirmation" value="{{ old('confirm-passoword') }}">
-            @error('confirm-password')
-            <div class="text-danger">{{ $message }}</div>
-            @enderror
           </div>
+
         </form>
+
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-        <button type="submit" class="btn btn-primary save-user">Save</button>
+        <button type="submit" id="save-user" class="btn btn-primary">Save</button>
       </div>
     </div>
   </div>
 </div>
 
 
-@if($errors->any())
+<!-- @if($errors->any())
 <script>
   $(window).on('load', function() {
     $('#exampleModal').modal('show');
   })
 </script>
-@endif
+@endif -->
 
 <div class="row">
   <div class="col-md-12">
@@ -266,6 +259,7 @@
           })
         },
         error: function(data) {
+          console.log(data);
           var err = '';
           for (e in data.responseJSON['errors']) {
             err += data.responseJSON['errors'][e] + '\n';
@@ -282,6 +276,7 @@
     });
 
     $('.edit-user').click(function() {
+
       $.ajax({
         url: '/user/' + $(this).data('id') + '/edit',
         type: 'GET',
@@ -295,61 +290,72 @@
 
           $("#name").val(name);
           $("#email").val(email);
-          $("#password").val(password);
+          // $("#password").val(password);
           $('#role').val(role).selected;
-          $('.dropify').dropify({
-            defaultFile: '/storage/' + profile_image
-          });
+
+          function getProfilePic() {
+            if (profile_image !== null) {
+
+              return $('#profile-image').attr('src', '/storage/' + profile_image);
+            }
+              return $('#profile-image').attr('src', "{{asset('frontend/img/user.svg')}}")
+          };
+
+          getProfilePic();
+
+
+          // $('.dropify').dropify({
+          //   defaultFile: '/storage/' + profile_image
+          // });
 
           $('#edit-user-modal').modal('show');
 
-          var drEvent = $('#image').dropify();
-          drEvent = drEvent.data('dropify');
-          drEvent.resetPreview();
-          drEvent.clearElement();
-          drEvent.settings.defaultFile = '/storage/' + profile_image;
-          drEvent.destroy();
-          drEvent.init();
-          $('.dropify#image').dropify({
-            defaultFile: '/storage/' + profile_image,
-          });
+          // var drEvent = $('#image').dropify();
 
-          $('.save-user').click(function() {
+          // drEvent = drEvent.data('dropify');
+          // drEvent.resetPreview();
+          // drEvent.clearElement();
+          // drEvent.settings.defaultFile = '/storage/' + profile_image;
+          // drEvent.destroy();
+          // drEvent.init();
+
+          // $('.dropify#image').dropify({
+          //   defaultFile: '/storage/' + profile_image,
+          // });
+
+
+          $('#save-user').click(function() {
+
             $.ajaxSetup({
               headers: {
                 'X-CSRF-TOKEN': jQuery('meta[name="csrf-token"]').attr('content')
               }
             });
-            name  = $("#name").val();
+
+            name = $("#name").val();
             email = $("#email").val();
             password = $("#password").val();
+            password_confirm = $("#password_confirmation").val();
             role = $("#role").val();
-            image = $("#image").val();
-
-            let myForm = document.querySelector('form');
-            let formData = new FormData();            
-            formData.append('name' , name);
-            formData.append('email', email);
-            formData.append('password', password);
-            formData.append('role', role);
-            // formData.append('image', image);
-            console.log(formData.entries);
 
             $.ajax({
               type: "PATCH",
               url: "/user/" + result.id,
-              enctype: 'multipart/form-data',
-              processData: false,
-              // contentType: false,
-              data: formData,
+              data: {
+                'name': name,
+                'email': email,
+                'role': role,
+                'password': password,
+                'password_confirmation': password_confirm,
+                // 'image': $0("#image").val,
+              },
               success: function(response) {
-                console.log(response);
                 swal({
                   title: "User successfully updated",
                   icon: "success",
                   timer: 5000
                 }).then(function() {
-                  // location.reload();
+                  location.reload();
                 });
               },
               error: function(data) {
@@ -369,7 +375,7 @@
 
         },
         error: function(data) {
-          console.log(data);
+          console.error(data);
         }
 
       });

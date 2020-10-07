@@ -83,8 +83,12 @@ class UserController extends Controller
      */
     public function edit($id)
     {
-        $user = User::find($id);
-        return $user;
+        if (Gate::allows('isAdmin')) {
+            $user = User::find($id);
+            return $user;
+        } else {
+            return back()->with('message', "You're not Authorized!");
+        }
     }
 
     /**
@@ -96,48 +100,49 @@ class UserController extends Controller
      */
     public function update(Request $request, $id)
     {
+        if (Gate::allows('isAdmin')) {
 
-        $user = User::find($id);
+            $user = User::find($id);
 
-        $request->validate([
-            'name'     => 'required',
-            'email'    => 'required|email|unique:users,email,'.$id,
-            'password' => 'sometimes|confirmed',
-            'role'     => 'required',
-            'image'    => 'image|nullable'
-        ]);
+            $request->validate([
+                'name'     => 'required',
+                'email'    => 'required|email|unique:users,email,' . $id,
+                'password' => 'sometimes|confirmed',
+                'role'     => 'required',
+                // 'image'    => 'nullable|image|mimes:jpeg,jpg,png'
+            ]);
 
-        $name     = $request->name;
-        $email    = $request->email;
-        $password = $request->password;
-        $role     = $request->role;
-        $image    = $request->image;
+            $name     = $request->name;
+            $email    = $request->email;
+            $password = $request->password;
+            $role     = $request->role;
+            $image    = $request->image;
 
-        if ($request->hasFile('image')) {
-            return response('file here');
-            $imageName = time() . '_' . $request->file('image')->getClientOriginalName();
+            if ($request->hasFile('image')) {
+                $imageName = time() . '_' . $request->file('image')->getClientOriginalName();
 
-            $image->move(storage_path('profile-photos'), $imageName);
+                $image->move(storage_path('profile-photos'), $imageName);
 
-            $user->profile_photo_path = 'profile-photos/' + $imageName;
-
-        }
-
-        if (!$password == '') {
-            if (!$email == '') {
-
-                $user->email = $email;
+                $user->profile_photo_path = 'profile-photos/' + $imageName;
             }
 
-            $user->password = $password;
+            if (!$password == '') {
+                if (!$email == '') {
+
+                    $user->email = $email;
+                }
+
+                $user->password = Hash::make($password);
+            }
+
+            $user->email = $email;
+            $user->name = $name;
+            $user->role = $role;
+            $user->save();
+            return response('success');
+        } else {
+            return back()->with('message', "You're not Authorized!");
         }
-
-        $user->email = $email;
-        $user->name = $name;
-        $user->role = $role;
-        $user->save();
-        return response('success');
-
     }
 
     /**
