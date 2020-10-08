@@ -4,11 +4,12 @@ namespace App\Http\Controllers;
 
 use App\Models\Post;
 use App\Models\Category;
+use App\Models\Gallery;
 use App\Models\Tag;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-
+use Intervention\Image\Facades\Image;
 
 class PostController extends Controller
 {
@@ -57,7 +58,7 @@ class PostController extends Controller
             'author' => 'required',
             'content' => 'required',
             'category' => 'required',
-            'image' => 'required|mimes:jpeg,png,jpg,gif|max:2048'
+            'image' => 'required|mimes:jpeg,png,jpg|max:2048'
         ]);
 
         $post = new Post();
@@ -133,11 +134,16 @@ class PostController extends Controller
      */
     public function update(Request $request, $id)
     {
+        $img = Image::make(base64_decode(json_decode($request->image)->data));
         $request->validate([
             'title'    => 'required',
             'author'   => 'required',
             'content'  => 'required',
             'category' => 'required',
+            'image'    => 'sometimes',
+            'image.*'    => 'image|mimes:jpeg,png,jpg,gif|max:2048',
+            'gallery'    => 'sometimes',
+            'gallery.*'    => 'image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
         $post = Post::find($id);
@@ -149,13 +155,23 @@ class PostController extends Controller
 
         if ($request->hasFile('image')) {
 
-            foreach ($request->image as $image) {
+            $imageName = time() . '_' . $request->image->getClientOriginalName();
+            $request->image->move(public_path('images'), $imageName);
+            $post->featured_image = $imageName;
+        }
 
-                $imageName = time() . '_' . $image->getClientOriginalName();
-                $image->move(public_path('images'), $imageName);
-                $post->featured_image = $imageName;
+        $data=[];
+        if($request->hasFile('gallery')) {
+            foreach($request->file('gallery') as $image)
+            {
+            $imageName = time() . '_' . $image->getClientOriginalName();
+            $image->move(public_path('images'), $imageName);
+            $data[] = $imageName;
             }
         }
+
+        $image = new Gallery();
+        $image->image = json_encode($data);
 
         $post->save();
 

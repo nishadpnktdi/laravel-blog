@@ -25,5 +25,10 @@ class Post extends Model
     {
         return $this->belongsToMany('App\Models\Tag');
     }
+
+    public function images()
+    {
+        return $this->hasMany('App\Models\Image');
+    }
     
 }

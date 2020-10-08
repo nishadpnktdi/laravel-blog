@@ -3,6 +3,7 @@
 
 <head>
   @include('admin/head')
+  @stack('styles')
 </head>
 
 <body>
