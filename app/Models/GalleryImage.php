@@ -5,12 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Gallery extends Model
+class GalleryImage extends Model
 {
     use HasFactory;
 
-    public function post()
+    public function posts()
     {
-        return $this->belongsTo('App\Models\Post');
+        $this->belongsTo('App\Models\Post');
     }
 }

@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Post;
 use App\Models\Category;
-use App\Models\Gallery;
+use App\Models\GalleryImage;
 use App\Models\Tag;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Http\Request;
@@ -98,10 +98,18 @@ class PostController extends Controller
         $prev = Post::where('id', '<', $post->id)->latest('id')->first();
         //End Next and Previous Post
 
+        $images_id = Post::find($id)->images_id;
+        $grabbed_img_array = GalleryImage::find($images_id);
+        if($grabbed_img_array == null){
+            $img_list = [];
+        } else {
+            $img_list = $grabbed_img_array['image'];
+        }
+
         if (empty($post)) {
             abort(404);
         } else {
-            return view('post')->with(compact('post', 'tags', 'categories', 'latest', 'next', 'prev'));
+            return view('post')->with(compact('post', 'tags', 'categories', 'latest', 'next', 'prev', 'img_list'));
         }
     }
 
@@ -121,7 +129,14 @@ class PostController extends Controller
             $categories = Category::get();
             $tags = Tag::get();
             $selectedTags = Post::find($id)->tags;
-            return view('post/edit', ['post' => $post, 'categories' => $categories, 'tags' => $tags, 'selectedTags' => $selectedTags]);
+            $images_id = Post::find($id)->images_id;
+            $grabbed_img_array = GalleryImage::find($images_id);
+            if($grabbed_img_array !== null){
+                $img_list = $grabbed_img_array['image'];
+                return view('post/edit', ['post' => $post, 'categories' => $categories, 'tags' => $tags, 'selectedTags' => $selectedTags, 'images'=> $img_list]);
+            }else{
+                return view('post/edit', ['post' => $post, 'categories' => $categories, 'tags' => $tags, 'selectedTags' => $selectedTags, 'images']);
+            }
         }
     }
 
@@ -134,16 +149,17 @@ class PostController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $img = Image::make(base64_decode(json_decode($request->image)->data));
+
+        // dd($img);
         $request->validate([
             'title'    => 'required',
             'author'   => 'required',
             'content'  => 'required',
             'category' => 'required',
-            'image'    => 'sometimes',
-            'image.*'    => 'image|mimes:jpeg,png,jpg,gif|max:2048',
-            'gallery'    => 'sometimes',
-            'gallery.*'    => 'image|mimes:jpeg,png,jpg|max:2048',
+            // 'image'    => 'sometimes',
+            // 'image.*'    => 'image|mimes:jpeg,png,jpg,gif|max:2048',
+            // 'gallery'    => 'sometimes',
+            // 'gallery.*'    => 'image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
         $post = Post::find($id);
@@ -159,20 +175,23 @@ class PostController extends Controller
             $request->image->move(public_path('images'), $imageName);
             $post->featured_image = $imageName;
         }
-
-        $data=[];
-        if($request->hasFile('gallery')) {
-            foreach($request->file('gallery') as $image)
-            {
-            $imageName = time() . '_' . $image->getClientOriginalName();
-            $image->move(public_path('images'), $imageName);
-            $data[] = $imageName;
+        // $img = $request->gallery;
+        // $gallery = Image::make(base64_decode(json_decode($request->gallery)->data));
+        if (isset($request->gallery)) {
+            $imgNames = [];
+            foreach ($request->gallery as $image) {
+                $some = json_decode($image);
+                $dat = $some->name;
+                $imageName = time() . '_' . $dat;
+                $decoded_image = Image::make($some->data);
+                $decoded_image->save(public_path('images/') . $imageName);
+                array_push($imgNames,$imageName);
             }
         }
-
-        $image = new Gallery();
-        $image->image = json_encode($data);
-
+        $image = new GalleryImage();
+        $image->image = json_encode($imgNames);
+        $image->save();
+        $post->images_id = $image->id;
         $post->save();
 
         if (isset($request->tags)) {

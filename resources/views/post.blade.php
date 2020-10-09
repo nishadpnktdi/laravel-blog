@@ -3,6 +3,7 @@
 
 <head>
   @include('head')
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
 </head>
 
 <body>
@@ -16,7 +17,18 @@
       <main class="post blog-post col-lg-8">
         <div class="container">
           <div class="post-single">
-            <div class="post-thumbnail"><img src="/images/{{$post->featured_image}}" alt="..." class="img-fluid"></div>
+            <div class="post-thumbnail">
+              <a data-fancybox="gallery" href="/images/{{$post->featured_image}}">
+                <img src="/images/{{$post->featured_image}}" alt="..." class="img-fluid">
+                @if($img_list)
+                @foreach(json_decode($img_list) as $img)
+                <a data-fancybox="gallery" href="/images/{{$img}}">
+                <img src="/images/{{$img}}" class="invisible d-none"/>
+                </a>
+                @endforeach
+                @endif
+              </a>
+            </div>
             <div class="post-details">
               <div class="post-meta d-flex justify-content-between">
                 <div class="category">
@@ -164,9 +176,16 @@
   </div>
   <!-- Page Footer-->
   <footer class="main-footer">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.css" />
+    <script src="https://cdn.jsdelivr.net/gh/fancyapps/fancybox@3.5.7/dist/jquery.fancybox.min.js"></script>
     @include('footer')
   </footer>
   <!-- JavaScript files-->
+  <script>
+    $(document).ready(function() {
+
+    });
+  </script>
   @include('scripts')
 </body>
 

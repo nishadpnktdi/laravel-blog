@@ -141,6 +141,15 @@
     allowMultiple: true,
     allowFileTypeValidation: true,
     acceptedFileTypes: ['image/*'],
+    files: [
+        @if(isset($images))
+        @foreach (json_decode($images) as $image)
+        {
+        source: '/images/{{$image}}'
+        },
+        @endforeach
+        @endif
+    ],
     allowFileEncode: true,
   });
 
