@@ -135,7 +135,7 @@ class PostController extends Controller
                 $img_list = $grabbed_img_array['image'];
                 return view('post/edit', ['post' => $post, 'categories' => $categories, 'tags' => $tags, 'selectedTags' => $selectedTags, 'images'=> $img_list]);
             }else{
-                return view('post/edit', ['post' => $post, 'categories' => $categories, 'tags' => $tags, 'selectedTags' => $selectedTags, 'images']);
+                return view('post/edit', ['post' => $post, 'categories' => $categories, 'tags' => $tags, 'selectedTags' => $selectedTags]);
             }
         }
     }
