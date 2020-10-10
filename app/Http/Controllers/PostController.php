@@ -11,6 +11,8 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use Intervention\Image\Facades\Image;
 
+use function GuzzleHttp\json_decode;
+
 class PostController extends Controller
 {
 
@@ -58,7 +60,7 @@ class PostController extends Controller
             'author' => 'required',
             'content' => 'required',
             'category' => 'required',
-            'image' => 'required|mimes:jpeg,png,jpg|max:2048'
+            // 'image' => 'required|mimes:jpeg,png,jpg|max:2048'
         ]);
 
         $post = new Post();
@@ -100,7 +102,7 @@ class PostController extends Controller
 
         $images_id = Post::find($id)->images_id;
         $grabbed_img_array = GalleryImage::find($images_id);
-        if($grabbed_img_array == null){
+        if ($grabbed_img_array == null) {
             $img_list = [];
         } else {
             $img_list = $grabbed_img_array['image'];
@@ -131,10 +133,10 @@ class PostController extends Controller
             $selectedTags = Post::find($id)->tags;
             $images_id = Post::find($id)->images_id;
             $grabbed_img_array = GalleryImage::find($images_id);
-            if($grabbed_img_array !== null){
+            if ($grabbed_img_array !== null) {
                 $img_list = $grabbed_img_array['image'];
-                return view('post/edit', ['post' => $post, 'categories' => $categories, 'tags' => $tags, 'selectedTags' => $selectedTags, 'images'=> $img_list]);
-            }else{
+                return view('post/edit', ['post' => $post, 'categories' => $categories, 'tags' => $tags, 'selectedTags' => $selectedTags, 'images' => $img_list]);
+            } else {
                 return view('post/edit', ['post' => $post, 'categories' => $categories, 'tags' => $tags, 'selectedTags' => $selectedTags]);
             }
         }
@@ -169,29 +171,33 @@ class PostController extends Controller
         $post->content  = $request->content;
         $post->category_id = $request->category;
 
-        if ($request->hasFile('image')) {
+        if (isset($request->image)) {
 
-            $imageName = time() . '_' . $request->image->getClientOriginalName();
-            $request->image->move(public_path('images'), $imageName);
+            $some = json_decode($request->image);
+            $imgDecodedName = $some->name;
+            $imageName = time() . '_' . $imgDecodedName;
+            $decoded_image = Image::make($some->data)->resize(700, 450);
+            $decoded_image->save(public_path('images/').$imageName);
             $post->featured_image = $imageName;
+
         }
-        // $img = $request->gallery;
-        // $gallery = Image::make(base64_decode(json_decode($request->gallery)->data));
+
+
         if (isset($request->gallery)) {
             $imgNames = [];
             foreach ($request->gallery as $image) {
                 $some = json_decode($image);
                 $dat = $some->name;
                 $imageName = time() . '_' . $dat;
-                $decoded_image = Image::make($some->data);
+                $decoded_image = Image::make($some->data)->resize(700, 450);
                 $decoded_image->save(public_path('images/') . $imageName);
-                array_push($imgNames,$imageName);
+                array_push($imgNames, $imageName);
             }
+            $image = new GalleryImage();
+            $image->image = json_encode($imgNames);
+            $image->save();
+            $post->images_id = $image->id;
         }
-        $image = new GalleryImage();
-        $image->image = json_encode($imgNames);
-        $image->save();
-        $post->images_id = $image->id;
         $post->save();
 
         if (isset($request->tags)) {
