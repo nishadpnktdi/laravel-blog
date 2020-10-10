@@ -1,5 +1,10 @@
 @extends('admin.layout')
 
+@prepend('styles')
+<link href="https://unpkg.com/filepond/dist/filepond.css" rel="stylesheet">
+<link href="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.css" rel="stylesheet">
+@endprepend
+
 @section('content')
 <form action="/post" method="POST" enctype="multipart/form-data">
   @csrf
@@ -49,12 +54,12 @@
             <div class="card-body">
               <h5 class="card-title">Featured Image</h5>
               <div class="form-group">
-                <div class="input-group col-xs-12">
-                  <input type="file" name="image" value="{{ old('image') }}" class="dropify"/>
+                <!-- <div class="input-group col-xs-12"> -->
+                  <input type="file" class="featured" name="image" value="{{ old('image') }}"/>
                   @error('image')
                 <div class="text-danger">{{ $message }}</div>
                 @enderror
-                </div>
+                <!-- </div> -->
               </div>
               <h5 class="card-title">Category</h5>
               <div class="form-group">
@@ -67,6 +72,7 @@
                 <div class="text-danger">{{ $message }}</div>
                 @enderror
               </div>
+
               <h5 class="card-title">Tags</h5>
               <div class="form-group select2 js-example-basic-multiple">
                 <select name="tags[]" class="form-control select-tags-basic-multiple" multiple="multiple">
@@ -78,6 +84,15 @@
                 <div class="text-danger">{{ $message }}</div>
                 @enderror
               </div>
+
+              <h5 class="card-title">Gallery</h5>
+              <div class="form-group">
+                <input type="file" name="gallery[]" value="{{old('gallery')}}" class="gallery" multiple/>
+                @error('image')
+                <div class="text-danger">{{ $message }}</div>
+                @enderror
+              </div>
+
             </div>
           </div>
         </div>
@@ -89,12 +104,36 @@
 @endsection
 
 @push('scripts')
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Dropify/0.2.2/js/dropify.js" integrity="sha512-hJsxoiLoVRkwHNvA5alz/GVA+eWtVxdQ48iy4sFRQLpDrBPn6BFZeUcW4R4kU+Rj2ljM9wHwekwVtsb0RY/46Q==" crossorigin="anonymous"></script>
+<!-- include FilePond library -->
+<script src="https://unpkg.com/filepond/dist/filepond.min.js"></script>
+
+<!-- include FilePond plugins -->
+<script src="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.min.js"></script>
+<script src="https://unpkg.com/filepond-plugin-file-encode/dist/filepond-plugin-file-encode.js"></script>
+
+<!-- include FilePond jQuery adapter -->
+<script src="https://unpkg.com/jquery-filepond/filepond.jquery.js"></script>
+
 <script>
   $(document).ready(function() {
     $('.select-category').select2();
     $('.select-tags-basic-multiple').select2();
-    $('.dropify').dropify();
+  });
+  $.fn.filepond.registerPlugin(FilePondPluginImagePreview);
+  FilePond.registerPlugin(FilePondPluginFileEncode);
+
+  // Turn input element into a pond
+  $('.gallery').filepond({
+    allowMultiple: true,
+    allowFileTypeValidation: true,
+    acceptedFileTypes: ['image/*'],
+    allowFileEncode: true,
+  });
+
+  $('.featured').filepond({
+    allowFileTypeValidation: true,
+    acceptedFileTypes: ['image/*'],
+    allowFileEncode: true,
   });
 </script>
 @endpush

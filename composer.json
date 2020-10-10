@@ -20,7 +20,8 @@
         "laravel/sanctum": "^2.6",
         "laravel/scout": "^8.3",
         "laravel/tinker": "^2.0",
-        "livewire/livewire": "^2.0"
+        "livewire/livewire": "^2.0",
+        "spatie/laravel-medialibrary": "^8.10"
     },
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^2.8",

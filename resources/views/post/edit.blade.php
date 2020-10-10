@@ -63,7 +63,7 @@
               <h5 class="card-title">Featured Image</h5>
               <div class="form-group">
                 <!-- <div class="input-group col-xs-12"> -->
-                <input type="file" name="image" class="featured" data-default-file="/images/{{ $post->featured_image }}" />
+                <input type="file" name="image" class="featured" />
                 <!-- </div> -->
                 @error('image')
                 <div class="text-danger">{{ $message }}</div>
@@ -110,7 +110,6 @@
     </div>
   </div>
 </form>
-
 @endsection
 
 @push('scripts')
@@ -157,7 +156,7 @@
     allowFileTypeValidation: true,
     acceptedFileTypes: ['image/*'],
     files: [{
-      source: '/images/{{ $post->featured_image }}',
+      source: ' ',
     }],
     allowFileEncode: true,
   });

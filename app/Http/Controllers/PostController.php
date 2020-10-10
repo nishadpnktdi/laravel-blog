@@ -8,6 +8,7 @@ use App\Models\GalleryImage;
 use App\Models\Tag;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Intervention\Image\Facades\Image;
 
@@ -65,10 +66,33 @@ class PostController extends Controller
 
         $post = new Post();
 
-        $imageName = time() . '_' . $request->file('image')->getClientOriginalName();
-        $request->image->move(public_path('images'), $imageName);
+        if (isset($request->image)) {
 
-        $post->featured_image = $imageName;
+            $some = json_decode($request->image);
+            $imgDecodedName = $some->name;
+            $imageName = time() . '_' . $imgDecodedName;
+            $decoded_image = Image::make($some->data)->resize(700, 450);
+            // $savedImage = $decoded_image->save(public_path('images/') . $imageName);
+            $post->addMedia($decoded_image)->toMediaCollection('featuredImage');
+            $post->featured_image = $imageName;
+        }
+
+        if (isset($request->gallery)) {
+            $imgNames = [];
+            foreach ($request->gallery as $image) {
+                $some = json_decode($image);
+                $dat = $some->name;
+                $imageName = time() . '_' . $dat;
+                $decoded_image = Image::make($some->data)->resize(700, 450);
+                $decoded_image->save(public_path('images/') . $imageName);
+                array_push($imgNames, $imageName);
+            }
+            $image = new GalleryImage();
+            $image->image = json_encode($imgNames);
+            $image->save();
+            $post->images_id = $image->id;
+        }
+
 
         $post->title = $request->title;
         $post->user_id = $request->author;
@@ -125,18 +149,24 @@ class PostController extends Controller
     {
         $post = new Post();
         $post = $post->where('id', $id)->first();
+
         if (empty($post)) {
+
             abort(404);
         } else {
+
             $categories = Category::get();
             $tags = Tag::get();
             $selectedTags = Post::find($id)->tags;
             $images_id = Post::find($id)->images_id;
             $grabbed_img_array = GalleryImage::find($images_id);
+
             if ($grabbed_img_array !== null) {
+
                 $img_list = $grabbed_img_array['image'];
                 return view('post/edit', ['post' => $post, 'categories' => $categories, 'tags' => $tags, 'selectedTags' => $selectedTags, 'images' => $img_list]);
             } else {
+
                 return view('post/edit', ['post' => $post, 'categories' => $categories, 'tags' => $tags, 'selectedTags' => $selectedTags]);
             }
         }
@@ -177,9 +207,8 @@ class PostController extends Controller
             $imgDecodedName = $some->name;
             $imageName = time() . '_' . $imgDecodedName;
             $decoded_image = Image::make($some->data)->resize(700, 450);
-            $decoded_image->save(public_path('images/').$imageName);
+            $decoded_image->save(public_path('images/') . $imageName);
             $post->featured_image = $imageName;
-
         }
 
 
