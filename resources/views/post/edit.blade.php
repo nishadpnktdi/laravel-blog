@@ -140,23 +140,21 @@
     allowMultiple: true,
     allowFileTypeValidation: true,
     acceptedFileTypes: ['image/*'],
-    files: [
-        @if(isset($images))
-        @foreach (json_decode($images) as $image)
-        {
-        source: '/images/{{$image}}'
-        },
-        @endforeach
-        @endif
-    ],
     allowFileEncode: true,
+    files: [
+      @foreach ($post->getMedia('gallery') as $image)
+        {
+        source: '{{$image->getUrl()}}'
+        },
+      @endforeach
+    ],
   });
 
   $('.featured').filepond({
     allowFileTypeValidation: true,
     acceptedFileTypes: ['image/*'],
     files: [{
-      source: ' ',
+      source: "{{$post->getFirstMediaUrl('featuredImage', 'thumb')}}",
     }],
     allowFileEncode: true,
   });

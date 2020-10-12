@@ -18,7 +18,19 @@
             <!-- post -->
             @foreach($posts as $post)
             <div class="post col-xl-6">
-              <div class="post-thumbnail"><a href="/post/{{$post->id}}"><img src="/images/{{ $post->featured_image }}" alt="..." class="img-fluid"></a></div>
+
+              <!-- <div class="post-thumbnail">
+                <a href="/post/{{$post->id}}">
+                <img src="/images/{{ $post->featured_image }}" alt="..." class="img-fluid">
+              </a>
+              </div> -->
+
+              <div class="post-thumbnail">
+                <a href="/post/{{$post->id}}">
+                <img src="{{ $post->getFirstMediaUrl('featuredImage', 'thumb') }}" alt="..." class="img-fluid">
+              </a>
+              </div>
+
               <div class="post-details">
                 <div class="post-meta d-flex justify-content-between">
                   <div class="date meta-last">{{$post->created_at->format('d M | Y')}}</div>

@@ -71,9 +71,9 @@ class PostController extends Controller
             $some = json_decode($request->image);
             $imgDecodedName = $some->name;
             $imageName = time() . '_' . $imgDecodedName;
-            $decoded_image = Image::make($some->data)->resize(700, 450);
+            // $decoded_image = Image::make($some->data)->resize(700, 450);s
             // $savedImage = $decoded_image->save(public_path('images/') . $imageName);
-            $post->addMedia($decoded_image)->toMediaCollection('featuredImage');
+            $post->addMediaFromBase64($some->data)->toMediaCollection('featuredImage');
             $post->featured_image = $imageName;
         }
 
@@ -83,14 +83,14 @@ class PostController extends Controller
                 $some = json_decode($image);
                 $dat = $some->name;
                 $imageName = time() . '_' . $dat;
-                $decoded_image = Image::make($some->data)->resize(700, 450);
-                $decoded_image->save(public_path('images/') . $imageName);
-                array_push($imgNames, $imageName);
+                // $decoded_image = Image::make($some->data)->resize(700, 450);
+                // $decoded_image->save(public_path('images/') . $imageName);
+                $post->addMediaFromBase64($some->data)->toMediaCollection('gallery');
+                // array_push($imgNames, $imageName);
             }
-            $image = new GalleryImage();
-            $image->image = json_encode($imgNames);
-            $image->save();
-            $post->images_id = $image->id;
+            // $image = new GalleryImage();
+            // $image->image = json_encode($imgNames);
+            // $post->images_id = $image->id;
         }
 
 
@@ -124,18 +124,19 @@ class PostController extends Controller
         $prev = Post::where('id', '<', $post->id)->latest('id')->first();
         //End Next and Previous Post
 
-        $images_id = Post::find($id)->images_id;
-        $grabbed_img_array = GalleryImage::find($images_id);
-        if ($grabbed_img_array == null) {
-            $img_list = [];
-        } else {
-            $img_list = $grabbed_img_array['image'];
-        }
+        // $images_id = Post::find($id)->images_id;
+        // $grabbed_img_array = GalleryImage::find($images_id);
+        // if ($grabbed_img_array == null) {
+        //     $img_list = [];
+        // } else {
+        //     $img_list = $grabbed_img_array['image'];
+        // }
 
+        
         if (empty($post)) {
             abort(404);
         } else {
-            return view('post')->with(compact('post', 'tags', 'categories', 'latest', 'next', 'prev', 'img_list'));
+            return view('post')->with(compact('post', 'tags', 'categories', 'latest', 'next', 'prev'));
         }
     }
 
@@ -159,12 +160,12 @@ class PostController extends Controller
             $tags = Tag::get();
             $selectedTags = Post::find($id)->tags;
             $images_id = Post::find($id)->images_id;
-            $grabbed_img_array = GalleryImage::find($images_id);
+            $grabbed_img_array = GalleryImage::find(1);
 
             if ($grabbed_img_array !== null) {
 
                 $img_list = $grabbed_img_array['image'];
-                return view('post/edit', ['post' => $post, 'categories' => $categories, 'tags' => $tags, 'selectedTags' => $selectedTags, 'images' => $img_list]);
+                return view('post/edit', ['post' => $post, 'categories' => $categories, 'tags' => $tags, 'selectedTags' => $selectedTags]);
             } else {
 
                 return view('post/edit', ['post' => $post, 'categories' => $categories, 'tags' => $tags, 'selectedTags' => $selectedTags]);
@@ -195,6 +196,7 @@ class PostController extends Controller
         ]);
 
         $post = Post::find($id);
+        // $gallery = new GalleryImage;
 
         $post->title    = $request->title;
         $post->user_id  = $request->author;
@@ -206,26 +208,28 @@ class PostController extends Controller
             $some = json_decode($request->image);
             $imgDecodedName = $some->name;
             $imageName = time() . '_' . $imgDecodedName;
-            $decoded_image = Image::make($some->data)->resize(700, 450);
-            $decoded_image->save(public_path('images/') . $imageName);
+            // $decoded_image = Image::make($some->data)->resize(700, 450);
+            // $decoded_image->save(public_path('images/') . $imageName);
+            $post->addMediaFromBase64($some->data)->toMediaCollection('featuredImage');
             $post->featured_image = $imageName;
         }
 
 
         if (isset($request->gallery)) {
-            $imgNames = [];
+            // $imgNames = [];
             foreach ($request->gallery as $image) {
                 $some = json_decode($image);
                 $dat = $some->name;
                 $imageName = time() . '_' . $dat;
-                $decoded_image = Image::make($some->data)->resize(700, 450);
-                $decoded_image->save(public_path('images/') . $imageName);
-                array_push($imgNames, $imageName);
+                // $decoded_image = Image::make($some->data)->resize(700, 450);
+                // $decoded_image->save(public_path('images/') . $imageName);
+                $post->addMediaFromBase64($some->data)->toMediaCollection('gallery');
+                // array_push($imgNames, $imageName);
             }
-            $image = new GalleryImage();
-            $image->image = json_encode($imgNames);
-            $image->save();
-            $post->images_id = $image->id;
+            // $image = new GalleryImage();
+            // $image->image = json_encode($imgNames);
+            // $gallery->save();
+            // $post->images_id = $gallery->id;
         }
         $post->save();
 

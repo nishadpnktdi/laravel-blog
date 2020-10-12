@@ -20,7 +20,7 @@
         <a href="/post/{{$post->id}}">
             <div class="item d-flex align-items-center">
                 <div class="image">
-                    <img src="/images/{{$post->featured_image}}" alt="..." class="img-fluid">
+                    <img src="{{ $post->getFirstMediaUrl('featuredImage') }}" alt="..." class="img-fluid">
                 </div>
                 <div class="title">
                     <strong>{{$post->title}}</strong>

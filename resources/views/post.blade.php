@@ -11,6 +11,7 @@
     <!-- Main Navbar-->
     @include('header')
   </header>
+
   <div class="container">
     <div class="row">
       <!-- Latest Posts -->
@@ -18,15 +19,13 @@
         <div class="container">
           <div class="post-single">
             <div class="post-thumbnail">
-              <a data-fancybox="gallery" href="/images/{{$post->featured_image}}">
-                <img src="/images/{{$post->featured_image}}" alt="..." class="img-fluid">
-                @if($img_list)
-                @foreach(json_decode($img_list) as $img)
-                <a data-fancybox="gallery" href="/images/{{$img}}">
-                <img src="/images/{{$img}}" class="invisible d-none"/>
+              <a data-fancybox="gallery" href="{{ $post->getFirstMediaUrl('featuredImage', 'thumb') }}">
+                <img src="{{ $post->getFirstMediaUrl('featuredImage', 'thumb') }}" alt="..." class="img-fluid">
+                @foreach($post->getMedia('gallery') as $img)
+                <a data-fancybox="gallery" href="{{$img->getUrl()}}">
+                <img src="{{$img->getUrl()}}" class="invisible d-none"/>
                 </a>
                 @endforeach
-                @endif
               </a>
             </div>
             <div class="post-details">

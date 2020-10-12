@@ -27,7 +27,7 @@ class AddGalleryImagesIdToPosts extends Migration
     {
         Schema::table('posts', function (Blueprint $table) {
             $table->dropForeign('images_id');
-            $table->dropIndex('images_id');
+            $table->dropIndex('images_id')->nullable();
         });
     }
 }

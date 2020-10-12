@@ -17,7 +17,6 @@ class AdminController extends Controller
         if (Gate::allows('isAdmin') || Gate::allows('isEditor')) {
 
             $posts = Post::get();
-
             return view('admin/dashboard')->with(compact("posts"));
 
         } else {

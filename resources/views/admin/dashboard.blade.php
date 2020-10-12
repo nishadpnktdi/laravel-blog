@@ -39,7 +39,7 @@
 
                     @foreach($posts as $post)
                     <tr>
-                      <td><img class="rounded-0" src="/images/{{$post->featured_image}}" /></td>
+                      <td><img class="rounded-0" src="{{$post->getFirstMediaUrl('featuredImage', 'thumb')}}" /></td>
                       <td>{{$post->title}}</td>
                       <td>{{$post->user->name}}</td>
                       <td>{{$post->created_at}}</td>
