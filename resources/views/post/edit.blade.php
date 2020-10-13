@@ -56,7 +56,7 @@
 
     <div class="col-md-4 d-flex align-items-stretch grid-margin">
       <div class="row flex-grow">
-        <div class="col-10 stretch-card">
+        <div class="col-12 stretch-card">
           <div class="card">
             <div class="card-body">
 
@@ -115,27 +115,34 @@
 @push('scripts')
 
 <!-- include FilePond library -->
-<script src="https://unpkg.com/filepond/dist/filepond.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/filepond/4.21.1/filepond.js" integrity="sha512-c1kUDsNxHP2kTWUnCJf3O2hxZtiat1gKM43+Wsh868L+9tt2jdiSS54afmvqvXj/hawS+EK20M+kLAobrMg4iA==" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/filepond/4.21.1/filepond.css" integrity="sha512-iqR58XVp+K0AENSCrB/aQjHOlGyj6qRAWJzbwlkKAPMyjJaoabEoqqVIA4ox3hfgTyVBqDLQKz6NsiI2lYtTCg==" crossorigin="anonymous" />
 
 <!-- include FilePond plugins -->
-<script src="https://unpkg.com/filepond-plugin-image-preview/dist/filepond-plugin-image-preview.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/filepond-plugin-image-preview@4.6.4/dist/filepond-plugin-image-preview.min.js"></script>
 <script src="https://unpkg.com/filepond-plugin-file-encode/dist/filepond-plugin-file-encode.js"></script>
 
 <!-- include FilePond jQuery adapter -->
 <script src="https://unpkg.com/jquery-filepond/filepond.jquery.js"></script>
-<!-- Dropify -->
-<!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/Dropify/0.2.2/js/dropify.js" integrity="sha512-hJsxoiLoVRkwHNvA5alz/GVA+eWtVxdQ48iy4sFRQLpDrBPn6BFZeUcW4R4kU+Rj2ljM9wHwekwVtsb0RY/46Q==" crossorigin="anonymous"></script> -->
 <script>
   $(document).ready(function() {
     $('.select-category').select2();
     $('.select-tags-basic-multiple').select2();
-  });
 
   // First register any plugins
   $.fn.filepond.registerPlugin(FilePondPluginImagePreview);
-  FilePond.registerPlugin(FilePondPluginFileEncode);
+  $.fn.filepond.registerPlugin(FilePondPluginFileEncode);
 
-  // Turn input element into a pond
+  
+  $('.featured').filepond({
+    allowFileTypeValidation: true,
+    acceptedFileTypes: ['image/*'],
+    files: [{
+      source: "{{$post->getFirstMediaUrl('featuredImage', 'thumb')}}",
+    }],
+    allowFileEncode: true,
+  });
+
   $('.gallery').filepond({
     allowMultiple: true,
     allowFileTypeValidation: true,
@@ -149,14 +156,7 @@
       @endforeach
     ],
   });
-
-  $('.featured').filepond({
-    allowFileTypeValidation: true,
-    acceptedFileTypes: ['image/*'],
-    files: [{
-      source: "{{$post->getFirstMediaUrl('featuredImage', 'thumb')}}",
-    }],
-    allowFileEncode: true,
+  
   });
 </script>
 @endpush

@@ -214,15 +214,20 @@ class PostController extends Controller
             $post->featured_image = $imageName;
         }
 
+        if($request->gallery == null) {
+            $post->clearMediaCollection('gallery');
+        }
 
         if (isset($request->gallery)) {
             // $imgNames = [];
+            $post->clearMediaCollection('gallery');
             foreach ($request->gallery as $image) {
                 $some = json_decode($image);
                 $dat = $some->name;
                 $imageName = time() . '_' . $dat;
                 // $decoded_image = Image::make($some->data)->resize(700, 450);
                 // $decoded_image->save(public_path('images/') . $imageName);
+                // $post->clearMediaCollection('gallery');
                 $post->addMediaFromBase64($some->data)->toMediaCollection('gallery');
                 // array_push($imgNames, $imageName);
             }

@@ -49,6 +49,6 @@ class Post extends Model implements HasMedia
         $this->addMediaConversion('thumb')
             ->width(700)
             ->height(450)
-            ->performOnCollections('featuredImage');
+            ->performOnCollections('featuredImage')->nonQueued();
     }
 }

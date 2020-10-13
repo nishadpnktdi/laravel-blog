@@ -23,8 +23,6 @@
 <link rel="stylesheet" href="{{ asset('admin/css/demo_1/style.css') }}">
 <!-- End Layout styles -->
 <link rel="shortcut icon" href="{{ asset('admin/images/favicon.ico') }}" />
-<!-- Dropify -->
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Dropify/0.2.2/css/dropify.css" integrity="sha512-In/+MILhf6UMDJU4ZhDL0R0fEpsp4D3Le23m6+ujDWXwl3whwpucJG1PEmI3B07nyJx+875ccs+yX2CqQJUxUw==" crossorigin="anonymous" />
 <!-- DataTable -->
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.22/css/jquery.dataTables.css">
 <script type="text/javascript" charset="utf8" src="https://cdn.datatables.net/1.10.22/js/jquery.dataTables.js"></script>
