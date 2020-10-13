@@ -45,7 +45,8 @@ class PostController extends Controller
     {
         $categories = Category::get();
         $tags = Tag::get();
-        return view('post/create')->with(compact("categories", "tags"));
+        $notifications = auth()->user()->unreadNotifications;
+        return view('post/create')->with(compact("categories", "tags", "notifications"));
     }
 
     /**
@@ -161,14 +162,15 @@ class PostController extends Controller
             $selectedTags = Post::find($id)->tags;
             $images_id = Post::find($id)->images_id;
             $grabbed_img_array = GalleryImage::find(1);
+            $notifications = auth()->user()->unreadNotifications;
 
             if ($grabbed_img_array !== null) {
 
                 $img_list = $grabbed_img_array['image'];
-                return view('post/edit', ['post' => $post, 'categories' => $categories, 'tags' => $tags, 'selectedTags' => $selectedTags]);
+                return view('post/edit', ['post' => $post, 'categories' => $categories, 'tags' => $tags, 'selectedTags' => $selectedTags, 'notification' => $notifications]);
             } else {
 
-                return view('post/edit', ['post' => $post, 'categories' => $categories, 'tags' => $tags, 'selectedTags' => $selectedTags]);
+                return view('post/edit', ['post' => $post, 'categories' => $categories, 'tags' => $tags, 'selectedTags' => $selectedTags, 'notifications' => $notifications]);
             }
         }
     }
