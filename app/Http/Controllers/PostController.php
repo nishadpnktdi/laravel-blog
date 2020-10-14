@@ -79,7 +79,6 @@ class PostController extends Controller
         }
 
         if (isset($request->gallery)) {
-            $imgNames = [];
             foreach ($request->gallery as $image) {
                 $some = json_decode($image);
                 $dat = $some->name;

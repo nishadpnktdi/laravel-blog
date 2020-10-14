@@ -47,79 +47,85 @@
             </div>
         </form>
         <ul class="navbar-nav ml-auto">
-
             <li class="nav-item dropdown">
-                <a class="nav-link count-indicator" id="messageDropdown" href="#" data-toggle="dropdown"
-                    aria-expanded="false">
-                    <i class="mdi mdi-bell-outline"></i>
-                    <span class="count">7</span>
-                </a>
-                <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list pb-0"
-                    aria-labelledby="messageDropdown">
-                  @if(isset($notifications))
-                      @if(auth()->user()->role == 'admin')
-                          @foreach($notifications as $notification)
-                              @if($loop->last)
-                                  <a href="#" class="dropdown-item py-3">
-                                      <p class="mb-0 font-weight-medium float-left">You have 7 unread mails </p>
-                                      <span class="badge badge-pill badge-primary float-right">Mark all as read</span>
-                                  </a>
-                              @endif
-
-                              <div class="dropdown-divider"></div>
-                              <a class="dropdown-item preview-item">
-                                  <div class="preview-thumbnail">
-                                      <img src="{{ asset('admin/images/faces/face10.jpg') }}"
-                                          alt="image" class="img-sm profile-pic"> </div>
-                                  <div class="preview-item-content flex-grow py-2">
-                                      <p class="preview-subject ellipsis font-weight-medium text-dark">New user created
-                                      </p>
-                                      <p class="font-weight-light small-text">
-                                          {{ $notification->data['name'] }} </p>
-                                      <p class="font-weight-light small-text">
-                                          {{ $notification->data['email'] }}</p>
-                                  </div>
-                              </a>
-                            @endforeach
+                @if(auth()->user()->role == 'admin')
+                    <a class="nav-link count-indicator" id="messageDropdown" href="#" data-toggle="dropdown"
+                        aria-expanded="false">
+                        <i class="mdi mdi-bell-outline"></i>
+                        @if($notifications->count() > 0)
+                        <span class="count">{{$notifications->count()}}</span>
                         @endif
-                    @endif
-
-                </div>
-            </li>
-
-            <li class="nav-item dropdown d-none d-xl-inline-block user-dropdown">
-                <a class="nav-link dropdown-toggle" id="UserDropdown" href="#" data-toggle="dropdown"
-                    aria-expanded="false">
-                    <img class="img-xs rounded-circle" src="{{ Auth::user()->profile_photo_url }}"
-                        alt="Profile image"> </a>
-                <div class="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="UserDropdown">
-                    <div class="dropdown-header text-center">
-                        <img class="img-md rounded-circle" src="{{ Auth::user()->profile_photo_url }}"
-                            alt="Profile image">
-                        <p class="mb-1 mt-3 font-weight-semibold">{{ Auth::user()->name }}</p>
-                        <p class="font-weight-light text-muted mb-0">{{ Auth::user()->email }}</p>
-                    </div>
-                    <a href="/user/profile" class="dropdown-item">My Profile<i
-                            class="dropdown-item-icon ti-dashboard"></i></a>
-                    <a class="dropdown-item">Messages<i class="dropdown-item-icon ti-comment-alt"></i></a>
-                    <a class="dropdown-item">Activity<i class="dropdown-item-icon ti-location-arrow"></i></a>
-                    <a class="dropdown-item">FAQ<i class="dropdown-item-icon ti-help-alt"></i></a>
-                    <a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault();
-                                                     document.getElementById('logout-form').submit();">
-                        {{ __('Sign Out') }}
-                        <i class="dropdown-item-icon ti-power-off"></i>
                     </a>
+                    <div class="dropdown-menu dropdown-menu-right navbar-dropdown preview-list pb-0"
+                        aria-labelledby="messageDropdown">
+                        <a href="#" class="dropdown-item py-3">
+                            @if(isset($notifications))
+                            @forelse($notifications as $notification)
+                            <p class="mb-0 font-weight-medium float-left">You have {{$notifications->count()}} notifications </p>
+                                    @if($loop->last)
+                                        <span class="badge badge-pill badge-primary float-right" id="mark-all">Mark all as read</span>
+                                    @endif
+                        </a>
 
-                    <form id="logout-form" action="{{ route('logout') }}" method="POST"
-                        style="display: none;">
-                        @csrf
-                    </form>
-                </div>
-            </li>
-        </ul>
-        <button class="navbar-toggler navbar-toggler-right d-lg-none align-self-center" type="button"
-            data-toggle="offcanvas">
-            <span class="mdi mdi-menu"></span>
-        </button>
+                        <div class="dropdown-divider"></div>
+                        <div class="dropdown-item preview-item">
+
+                            <div class="preview-thumbnail">
+                                <img src="{{ asset('admin/images/faces/face10.jpg') }}"
+                                    alt="image" class="img-sm profile-pic">
+                            </div>
+                            <div class="preview-item-content flex-grow py-2">
+                                <p class="preview-subject ellipsis font-weight-medium text-dark">New user created</p>
+                                <p class="font-weight-light small-text">
+                                    {{ $notification->data['name'] }} </p>
+                                <p class="font-weight-light small-text">
+                                    {{ $notification->data['email'] }}</p>
+                            </div>
+                            <span>
+                                <a href="#" class="mark-as-read" data-id={{ $notification->id }}><i class="mdi mdi-check text-success"></i></a>
+                            </span>
+                        </div>
+
+                    @empty
+                        <p class="mb-0 font-weight-medium float-left">No new notifications</p>
+                        <p class="mb-0 font-weight-medium float-left"></p>
+                        <a class="dropdown-item preview-item"></a>
+                @endforelse
+                @endif
+
+    </div>
+    </li>
+    @endif
+
+    <li class="nav-item dropdown d-none d-xl-inline-block user-dropdown">
+        <a class="nav-link dropdown-toggle" id="UserDropdown" href="#" data-toggle="dropdown" aria-expanded="false">
+            <img class="img-xs rounded-circle" src="{{ Auth::user()->profile_photo_url }}" alt="Profile image"> </a>
+        <div class="dropdown-menu dropdown-menu-right navbar-dropdown" aria-labelledby="UserDropdown">
+            <div class="dropdown-header text-center">
+                <img class="img-md rounded-circle" src="{{ Auth::user()->profile_photo_url }}" alt="Profile image">
+                <p class="mb-1 mt-3 font-weight-semibold">{{ Auth::user()->name }}</p>
+                <p class="font-weight-light text-muted mb-0">{{ Auth::user()->email }}</p>
+            </div>
+            <a href="/user/profile" class="dropdown-item">My Profile<i class="dropdown-item-icon ti-dashboard"></i></a>
+            <a class="dropdown-item">Messages<i class="dropdown-item-icon ti-comment-alt"></i></a>
+            <a class="dropdown-item">Activity<i class="dropdown-item-icon ti-location-arrow"></i></a>
+            <a class="dropdown-item">FAQ<i class="dropdown-item-icon ti-help-alt"></i></a>
+            <a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault();
+                                                     document.getElementById('logout-form').submit();">
+                {{ __('Sign Out') }}
+                <i class="dropdown-item-icon ti-power-off"></i>
+            </a>
+
+            <form id="logout-form" action="{{ route('logout') }}" method="POST"
+                style="display: none;">
+                @csrf
+            </form>
+        </div>
+    </li>
+    </ul>
+    <button class="navbar-toggler navbar-toggler-right d-lg-none align-self-center" type="button"
+        data-toggle="offcanvas">
+        <span class="mdi mdi-menu"></span>
+    </button>
     </div>
 </nav>

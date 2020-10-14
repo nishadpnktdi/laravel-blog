@@ -29,9 +29,9 @@ Route::resources([
     'post' => PostController::class,
     'contact' => ContactController::class,
     'user' => UserController::class,
-]);
-
-Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', AdminController::class)->name('dashboard');
+    ]);
+    
+Route::get('/dashboard', [AdminController::class, 'index'])->middleware(['auth:sanctum', 'verified'])->name('dashboard');
 
 Route::get('/blog', [PostController::class, 'index']);
 
@@ -41,3 +41,5 @@ Route::get('/contact-us', function ()
 {
     return view('contact');
 });
+
+Route::post('/mark-as-read', [AdminController::class,'markNotification'])->name('markNotification');
