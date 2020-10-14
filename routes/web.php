@@ -43,3 +43,7 @@ Route::get('/contact-us', function ()
 });
 
 Route::post('/mark-as-read', [AdminController::class,'markNotification'])->name('markNotification');
+
+Route::get('login/facebook', [LoginController::class, 'redirectToProvider']);
+
+Route::get('login/facebook/callback', [LoginController::class, 'handleProviderCallback']);

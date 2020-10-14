@@ -3,10 +3,14 @@
         <x-slot name="logo">
             <x-jet-authentication-card-logo />
         </x-slot>
+        <div id="fb-root"></div>
+        <script async defer crossorigin="anonymous"
+            src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v8.0&appId=1467793736753288&autoLogAppEvents=1"
+            nonce="WUEIGzLH"></script>
 
         <x-jet-validation-errors class="mb-4" />
 
-        @if (session('status'))
+        @if(session('status'))
             <div class="mb-4 font-medium text-sm text-green-600">
                 {{ session('status') }}
             </div>
@@ -17,12 +21,14 @@
 
             <div>
                 <x-jet-label value="{{ __('Email') }}" />
-                <x-jet-input class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus />
+                <x-jet-input class="block mt-1 w-full" type="email" name="email" :value="old('email')" required
+                    autofocus />
             </div>
 
             <div class="mt-4">
                 <x-jet-label value="{{ __('Password') }}" />
-                <x-jet-input class="block mt-1 w-full" type="password" name="password" required autocomplete="current-password" />
+                <x-jet-input class="block mt-1 w-full" type="password" name="password" required
+                    autocomplete="current-password" />
             </div>
 
             <div class="block mt-4">
@@ -33,8 +39,9 @@
             </div>
 
             <div class="flex items-center justify-end mt-4">
-                @if (Route::has('password.request'))
-                    <a class="underline text-sm text-gray-600 hover:text-gray-900" href="{{ route('password.request') }}">
+                @if(Route::has('password.request'))
+                    <a class="underline text-sm text-gray-600 hover:text-gray-900"
+                        href="{{ route('password.request') }}">
                         {{ __('Forgot your password?') }}
                     </a>
                 @endif
@@ -42,6 +49,14 @@
                 <x-jet-button class="ml-4">
                     {{ __('Login') }}
                 </x-jet-button>
+
+
+            </div>
+            <div class="flex justify-center mt-4">
+                <!-- <a href="{{ url('auth/facebook') }}"> -->
+                    <div class="fb-login-button" data-size="large" data-button-type="login_with" data-layout="default"
+                        data-auto-logout-link="false" data-use-continue-as="false" data-width=""></div>
+                <!-- </a> -->
             </div>
         </form>
     </x-jet-authentication-card>
