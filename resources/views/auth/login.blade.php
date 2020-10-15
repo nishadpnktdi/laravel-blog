@@ -4,10 +4,6 @@
             <x-jet-authentication-card-logo />
         </x-slot>
         <div id="fb-root"></div>
-        <script async defer crossorigin="anonymous"
-            src="https://connect.facebook.net/en_US/sdk.js#xfbml=1&version=v8.0&appId=1467793736753288&autoLogAppEvents=1"
-            nonce="WUEIGzLH"></script>
-
         <x-jet-validation-errors class="mb-4" />
 
         @if(session('status'))
@@ -49,15 +45,16 @@
                 <x-jet-button class="ml-4">
                     {{ __('Login') }}
                 </x-jet-button>
-
-
             </div>
-            <div class="flex justify-center mt-4">
-                <!-- <a href="{{ url('auth/facebook') }}"> -->
-                    <div class="fb-login-button" data-size="large" data-button-type="login_with" data-layout="default"
-                        data-auto-logout-link="false" data-use-continue-as="false" data-width=""></div>
-                <!-- </a> -->
-            </div>
+            
+            <a href="{{ url('login/facebook') }}">
+            <h3>Facebook</h3>
+            </a>
+
+            <a href="{{ url('login/google') }}">
+            <h3>Google</h3>
+            </a>
+            
         </form>
     </x-jet-authentication-card>
 </x-guest-layout>

@@ -9,6 +9,8 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\UserController;
 use Symfony\Component\HttpFoundation\Request;
+use App\Http\Controllers\FacebookController;
+use App\Http\Controllers\GoogleController;
 
 /*
 |--------------------------------------------------------------------------
@@ -44,6 +46,10 @@ Route::get('/contact-us', function ()
 
 Route::post('/mark-as-read', [AdminController::class,'markNotification'])->name('markNotification');
 
-Route::get('login/facebook', [LoginController::class, 'redirectToProvider']);
+Route::get('/login/facebook', [FacebookController::class, 'redirectToFacebook']);
 
-Route::get('login/facebook/callback', [LoginController::class, 'handleProviderCallback']);
+Route::get('/login/facebook/callback', [FacebookController::class, 'handleFacebookCallback']);
+
+Route::get('/login/google', [GoogleController::class, 'redirectToGoogle']);
+
+Route::get('/login/google/callback', [GoogleController::class, 'handleGoogleCallback']);
