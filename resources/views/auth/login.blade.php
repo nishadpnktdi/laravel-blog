@@ -46,14 +46,19 @@
                     {{ __('Login') }}
                 </x-jet-button>
             </div>
-            
+            <div class="inline-flex mt-4">
             <a href="{{ url('login/facebook') }}">
-            <button style="margin-right: 20px;">Facebook</button>
+            <h3 class="bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 border-b-4 border-blue-700 hover:border-blue-500 rounded mr-5">
+                Facebook
+            </h3>
             </a>
 
             <a href="{{ url('login/google') }}">
-            <button>Google</button>
+            <h3 class="bg-red-500 hover:bg-red-400 text-white font-bold py-2 px-4 border-b-4 border-red-700 hover:border-red-500 rounded">
+                Google
+            </h3>
             </a>
+            </div>
             
         </form>
     </x-jet-authentication-card>

@@ -5,9 +5,6 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <meta name="google-signin-client_id"
-        content="784270023248-jo1invtmvrrsbb7e560nkkt9llvq94fk.apps.googleusercontent.com">
-    <script src="https://apis.google.com/js/platform.js?onload=renderButton" async defer></script>
     <title>{{ config('app.name', 'Laravel') }}</title>
 
     <!-- Fonts -->
