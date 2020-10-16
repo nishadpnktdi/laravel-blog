@@ -48,11 +48,11 @@
             </div>
             
             <a href="{{ url('login/facebook') }}">
-            <h3>Facebook</h3>
+            <button style="margin-right: 20px;">Facebook</button>
             </a>
 
             <a href="{{ url('login/google') }}">
-            <h3>Google</h3>
+            <button>Google</button>
             </a>
             
         </form>

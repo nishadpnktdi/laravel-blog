@@ -30,6 +30,13 @@ class GoogleController extends Controller
                             ->orWhere('email', $user->email)->first();
        
             if($finduser){
+
+                if($finduser->email == $user->email)
+                {
+                    $finduser->update([
+                        'google_id'=> $user->id,
+                    ]);
+                }
        
                 Auth::login($finduser);
       
