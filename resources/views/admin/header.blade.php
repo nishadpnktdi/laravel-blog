@@ -62,7 +62,7 @@
                             @if(isset($notifications))
                             @forelse($notifications as $notification)
                             <p class="mb-0 font-weight-medium float-left">You have {{$notifications->count()}} notifications </p>
-                                    @if($loop->last)
+                                    @if($loop->first)
                                         <span class="badge badge-pill badge-primary float-right" id="mark-all">Mark all as read</span>
                                     @endif
                         </a>

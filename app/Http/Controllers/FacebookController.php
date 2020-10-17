@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Notifications\NotifyAdminUserCreation;
 use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Laravel\Socialite\Facades\Socialite;
+Use App\Events\NewUserRegisteredEvent;
 
 class FacebookController extends Controller
 {
@@ -50,11 +52,13 @@ class FacebookController extends Controller
                     'facebook_id'=> $user->id,
                     'password' => encrypt('bla321'),
                 ]);
-      
+
+                event(new NewUserRegisteredEvent($newUser));
                 Auth::login($newUser);
       
                 return redirect()->intended('dashboard');
             }
+
       
         } catch (Exception $e) {
             dd($e->getMessage());
