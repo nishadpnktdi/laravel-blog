@@ -9,6 +9,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Laravel\Socialite\Facades\Socialite;
 Use App\Events\NewUserRegisteredEvent;
+use App\Events\NewUserRegisteredUsingSocial;
 
 class FacebookController extends Controller
 {
@@ -53,7 +54,8 @@ class FacebookController extends Controller
                     'password' => encrypt('bla321'),
                 ]);
 
-                event(new NewUserRegisteredEvent($newUser));
+                event(new NewUserRegisteredUsingSocial($user));
+                
                 Auth::login($newUser);
       
                 return redirect()->intended('dashboard');
