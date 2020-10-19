@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\NewUserRegisteredUsingSocial;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Exception;
@@ -50,6 +51,8 @@ class GoogleController extends Controller
                     'google_id'=> $user->id,
                     'password' => encrypt('bla321'),
                 ]);
+
+                event(new NewUserRegisteredUsingSocial($user));
       
                 Auth::login($newUser);
       
